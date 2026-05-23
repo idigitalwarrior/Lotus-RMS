@@ -318,11 +318,20 @@ onAuthStateChanged(auth, async (firebaseUser) => {
   const userData = snap.data();
   if (userData.role !== 'employee') { await signOut(auth); window.location.href = 'employee-login.html'; return; }
   currentUser = { uid: firebaseUser.uid, ...userData };
-  initUI();
+  await initUI(); // FIX: await initUI so records are loaded before overlay hides
   document.getElementById('loading-overlay').style.display = 'none';
 });
 
-function initUI() {
+// ── Core data fetcher — single source of truth ──
+// FIX: All pages call this to ensure allRecords is always fresh from Firestore
+async function fetchUserRecords() {
+  const q = query(collection(db, 'reviews'), where('employeeId','==',currentUser.uid), orderBy('date','desc'));
+  const snap = await getDocs(q);
+  allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return allRecords;
+}
+
+async function initUI() {
   // Sidebar info
   document.getElementById('sb-avatar').textContent = getInitials(currentUser.name);
   document.getElementById('sb-name').textContent = currentUser.name;
@@ -372,10 +381,11 @@ function initUI() {
     window.location.href = 'employee-login.html';
   });
 
-  // Check today's submission when opening submit page
+  // Re-check existing submission whenever date changes on Submit page
   document.getElementById('submit-date').addEventListener('change', checkTodaySubmission);
 
-  loadOverview();
+  // FIX: await the initial data load so allRecords is ready before UI is shown
+  await loadOverview();
 }
 
 window.goToPage = function(page) {
@@ -398,9 +408,8 @@ async function loadOverview() {
     const month = monthStr();
     const year = yearStr();
 
-    const q = query(collection(db, 'reviews'), where('employeeId','==',currentUser.uid), orderBy('date','desc'));
-    const snap = await getDocs(q);
-    allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // FIX: always fetches fresh data from Firestore
+    await fetchUserRecords();
 
     const todayRec = allRecords.find(r => r.date === today);
     const todayCount = todayRec ? (todayRec.count || 0) : 0;
@@ -471,6 +480,8 @@ function renderRecentTable(records) {
 async function checkTodaySubmission() {
   const date = document.getElementById('submit-date').value;
   if (!date) return;
+  // FIX: always fetch fresh records so existing submission is never missed
+  await fetchUserRecords();
   const rec = allRecords.find(r => r.date === date);
   const card = document.getElementById('submit-existing-card');
   if (rec) {
@@ -529,6 +540,8 @@ async function loadHistory() {
   tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;"><div class="spinner" style="width:24px;height:24px;margin:0 auto;"></div></td></tr>`;
 
   try {
+    // FIX: fetch fresh data from Firestore every time History is opened
+    await fetchUserRecords();
     let records = allRecords;
     if (monthFilter) records = records.filter(r => r.date?.startsWith(monthFilter));
     records = [...records].sort((a,b) => b.date?.localeCompare(a.date));
@@ -572,12 +585,11 @@ async function saveEdit() {
     await updateDoc(doc(db, 'reviews', id), { count, notes, updatedAt: serverTimestamp() });
     showToast('Record updated!', 'success');
     closeModal('edit-modal');
-    // Refresh
-    const q = query(collection(db, 'reviews'), where('employeeId','==',currentUser.uid), orderBy('date','desc'));
-    const snap = await getDocs(q);
-    allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // FIX: use fetchUserRecords() once, then refresh both views from the same fresh data
+    await fetchUserRecords();
+    renderRecentTable(allRecords.slice(0, 5));
+    renderWeeklyChart();
     loadHistory();
-    loadOverview();
   } catch(e) {
     msgEl.textContent = 'Error: ' + e.message; msgEl.className='alert alert-danger'; msgEl.classList.remove('hidden');
   }
@@ -588,6 +600,8 @@ async function saveEdit() {
 async function loadStats() {
   const month = monthStr();
   const year = yearStr();
+  // FIX: fetch fresh data from Firestore every time Stats is opened
+  await fetchUserRecords();
   const monthRecords = allRecords.filter(r => r.date?.startsWith(month));
   const yearRecords = allRecords.filter(r => r.date?.startsWith(year));
   const monthTotal = monthRecords.reduce((s,r) => s+(r.count||0), 0);
