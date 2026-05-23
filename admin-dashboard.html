@@ -733,12 +733,20 @@ function loadOverview() {
 
 function getTarget(type, brand, period) {
   let targets = allTargets.filter(t => t.type === type);
-  if (brand) targets = targets.filter(t => t.brand === brand);
-  // Match period
-  if (type === 'daily') targets = targets.filter(t => !t.period || t.period === period);
-  else if (type === 'monthly') targets = targets.filter(t => !t.period || period.startsWith(t.period));
-  else if (type === 'yearly') targets = targets.filter(t => !t.period || period.startsWith(t.period));
-  return targets.length ? targets[targets.length-1].value : 0;
+  if (brand) targets = targets.filter(t => !t.brand || t.brand === brand);
+  // Flexible period matching — handles correctly-stored and legacy period formats
+  if (type === 'daily') {
+    // period = YYYY-MM-DD; stored period may be YYYY-MM-DD, YYYY-MM, or YYYY
+    targets = targets.filter(t => !t.period || t.period === period || period.startsWith(t.period));
+  } else if (type === 'monthly') {
+    // period = YYYY-MM; stored period may be YYYY-MM or YYYY
+    targets = targets.filter(t => !t.period || t.period === period || period.startsWith(t.period));
+  } else if (type === 'yearly') {
+    // period = YYYY; stored period may be YYYY, YYYY-MM, or YYYY-MM-DD
+    // FIX: was period.startsWith(t.period) which was reversed
+    targets = targets.filter(t => !t.period || t.period === period || t.period.startsWith(period));
+  }
+  return targets.length ? targets[targets.length - 1].value : 0;
 }
 
 function updateTargetBar(barId, pctId, numsId, current, target) {
@@ -812,27 +820,54 @@ function renderTargetTable() {
   `).join('');
 }
 
+function getDefaultPeriod(type) {
+  if (type === 'daily')   return todayStr();
+  if (type === 'monthly') return monthStr();
+  if (type === 'yearly')  return yearStr();
+  return monthStr();
+}
+
+function updateTargetPeriodHint(type) {
+  const label = document.querySelector('#target-period-group label');
+  const input = document.getElementById('target-period');
+  if (type === 'daily')   { if(label) label.textContent = 'Period (YYYY-MM-DD)'; if(input) input.placeholder = 'e.g. ' + todayStr(); }
+  if (type === 'monthly') { if(label) label.textContent = 'Period (YYYY-MM)';    if(input) input.placeholder = 'e.g. ' + monthStr(); }
+  if (type === 'yearly')  { if(label) label.textContent = 'Period (YYYY)';       if(input) input.placeholder = 'e.g. ' + yearStr(); }
+}
+
 window.openTargetModal = function(id = null) {
   document.getElementById('target-edit-id').value = id || '';
   if (id) {
     const t = allTargets.find(x => x.id === id);
     if (t) {
-      document.getElementById('target-type').value = t.type || 'daily';
+      document.getElementById('target-type').value  = t.type  || 'daily';
       document.getElementById('target-brand').value = t.brand || '';
       document.getElementById('target-value').value = t.value || '';
-      document.getElementById('target-period').value = t.period || '';
+      document.getElementById('target-period').value = t.period || getDefaultPeriod(t.type || 'daily');
+      updateTargetPeriodHint(t.type || 'daily');
     }
     document.getElementById('target-modal-title').textContent = 'Edit Target';
   } else {
-    document.getElementById('target-type').value = 'daily';
-    document.getElementById('target-brand').value = '';
-    document.getElementById('target-value').value = '';
-    document.getElementById('target-period').value = monthStr();
+    document.getElementById('target-type').value   = 'daily';
+    document.getElementById('target-brand').value  = '';
+    document.getElementById('target-value').value  = '';
+    // FIX: default period now uses correct format per type (was always monthStr)
+    document.getElementById('target-period').value = todayStr();
+    updateTargetPeriodHint('daily');
     document.getElementById('target-modal-title').textContent = 'Set New Target';
   }
   document.getElementById('target-msg').classList.add('hidden');
   openModal('target-modal');
 };
+
+// Auto-update period field when type changes
+document.getElementById('target-type')?.addEventListener('change', function() {
+  const isEditing = !!document.getElementById('target-edit-id').value;
+  if (!isEditing) {
+    document.getElementById('target-period').value = getDefaultPeriod(this.value);
+  }
+  updateTargetPeriodHint(this.value);
+});
 
 async function saveTarget() {
   const id = document.getElementById('target-edit-id').value;
