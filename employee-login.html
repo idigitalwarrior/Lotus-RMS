@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Login — Lotus Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.auth-hint { font-size:0.8rem; font-weight:700; color:var(--text-muted); background:var(--bg); box-shadow:var(--nm-in); border-radius:8px; padding:10px 14px; }
+.auth-hint strong { color:var(--primary); }
+.divider { display:flex;align-items:center;gap:12px;color:var(--text-muted);font-size:0.82rem;font-weight:700; }
+.divider::before,.divider::after { content:'';flex:1;height:1px;background:var(--border); }
+</style>
+</head>
+<body>
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <p style="font-weight:800;color:var(--text-muted);">Loading...</p>
+</div>
+
+<div class="auth-page">
+  <!-- Left Panel -->
+  <div class="auth-panel-left">
+    <div class="auth-brand">
+      <div class="logo-mark">L</div>
+      <h2>Employee Portal</h2>
+      <p>Track and submit your daily review collection records for Lotus dealerships.</p>
+      <div style="margin-top:40px;text-align:left;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✅</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:0.9rem;">Submit Daily Reviews</div>
+              <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:600;">Log how many reviews you collected today</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✏️</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:0.9rem;">Edit Your Records</div>
+              <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:600;">Update past submissions anytime</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">📊</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:0.9rem;">Track Your Progress</div>
+              <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:600;">See your stats and achievements</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="auth-panel-right">
+    <div class="auth-form-wrap">
+      <div class="auth-back" onclick="window.location.href='index.html'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Home
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="tabs auth-tabs" data-tabs>
+        <button class="tab-btn" data-tab="tab-login">Sign In</button>
+        <button class="tab-btn" data-tab="tab-signup">Sign Up</button>
+      </div>
+
+      <!-- Sign In Tab -->
+      <div id="tab-login" class="tab-content">
+        <h2 class="auth-title mt-2">Welcome back</h2>
+        <p class="auth-subtitle">Sign in to your employee account</p>
+
+        <div class="auth-hint mb-2">
+          <strong>Allowed emails:</strong> @lhmail.com (Hyundai) or @lvmail.com (Vinfast)
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <div class="form-group">
+            <label>Work Email</label>
+            <input type="email" id="login-email" class="form-control" placeholder="yourname@lhmail.com" required>
+            <span class="form-error" id="login-email-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-pass" class="form-control" placeholder="Enter your password" required>
+            <span class="form-error" id="login-pass-err"></span>
+          </div>
+          <div id="login-error" class="alert alert-danger hidden"></div>
+          <button type="submit" class="btn btn-accent btn-wide" id="login-btn">
+            Sign In
+          </button>
+          <p class="text-center" style="font-size:0.85rem;color:var(--text-muted);">
+            Don't have an account? <a class="auth-link" id="go-signup">Sign up here</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Sign Up Tab -->
+      <div id="tab-signup" class="tab-content">
+        <h2 class="auth-title mt-2">Create Account</h2>
+        <p class="auth-subtitle">Register as an employee</p>
+
+        <div class="auth-hint mb-2">
+          <strong>Allowed emails:</strong> @lhmail.com (Hyundai) or @lvmail.com (Vinfast)
+        </div>
+
+        <form id="signup-form" class="auth-form">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="signup-name" class="form-control" placeholder="Your full name" required>
+            <span class="form-error" id="signup-name-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Work Email</label>
+            <input type="email" id="signup-email" class="form-control" placeholder="yourname@lhmail.com" required>
+            <span class="form-error" id="signup-email-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="signup-pass" class="form-control" placeholder="Min 6 characters" required minlength="6">
+            <span class="form-error" id="signup-pass-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="signup-pass2" class="form-control" placeholder="Repeat password" required>
+            <span class="form-error" id="signup-pass2-err"></span>
+          </div>
+          <div id="signup-error" class="alert alert-danger hidden"></div>
+          <div id="signup-success" class="alert alert-success hidden"></div>
+          <button type="submit" class="btn btn-accent btn-wide" id="signup-btn">
+            Create Account
+          </button>
+          <p class="text-center" style="font-size:0.85rem;color:var(--text-muted);">
+            Already have an account? <a class="auth-link" id="go-login">Sign in here</a>
+          </p>
+        </form>
+      </div>
+
+      <div style="margin-top:32px;padding-top:20px;border-top:1px solid var(--border);text-align:center;font-size:0.75rem;color:var(--text-muted);font-weight:700;">
+        Developed by <strong>Dharun Kumar N</strong> ( SEO &amp; ORM Analyst @ Lotus Hyundai HO )
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { auth, db, validateEmail, getBrandFromEmail } from './js/firebase-config.js';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  doc, setDoc, getDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { showToast, initTabs } from './js/utils.js';
+
+// Hide loading overlay
+document.getElementById('loading-overlay').style.display = 'none';
+
+// Init tabs
+initTabs('[data-tabs]');
+
+// Tab switch links
+document.getElementById('go-signup')?.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn')[1].click();
+});
+document.getElementById('go-login')?.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn')[0].click();
+});
+
+// ── Login ──
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.add('hidden');
+
+  const validation = validateEmail(email);
+  if (!validation.valid) {
+    document.getElementById('login-email-err').textContent = validation.message;
+    return;
+  }
+  document.getElementById('login-email-err').textContent = '';
+
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    const snap = await getDoc(doc(db, 'users', cred.user.uid));
+    if (!snap.exists()) throw new Error('Account not found in system.');
+    const userData = snap.data();
+    if (userData.role === 'admin' || userData.role === 'admin-pending') {
+      await auth.signOut();
+      throw new Error('This is an employee portal. Please use the Admin portal.');
+    }
+    if (userData.status === 'suspended') {
+      await auth.signOut();
+      throw new Error('Your account has been suspended. Contact admin.');
+    }
+    sessionStorage.setItem('lotus_user', JSON.stringify({
+      uid: cred.user.uid, ...userData
+    }));
+    showToast('Signed in successfully!', 'success');
+    setTimeout(() => window.location.href = 'employee-dashboard.html', 800);
+  } catch (err) {
+    let msg = err.message;
+    if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) msg = 'Invalid email or password.';
+    errEl.textContent = msg; errEl.classList.remove('hidden');
+    btn.textContent = 'Sign In'; btn.disabled = false;
+  }
+});
+
+// ── Sign Up ──
+document.getElementById('signup-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  const pass2 = document.getElementById('signup-pass2').value;
+  const errEl = document.getElementById('signup-error');
+  const successEl = document.getElementById('signup-success');
+  errEl.classList.add('hidden'); successEl.classList.add('hidden');
+
+  // Validate
+  let hasErr = false;
+  if (!name) { document.getElementById('signup-name-err').textContent = 'Name is required'; hasErr = true; }
+  else document.getElementById('signup-name-err').textContent = '';
+
+  const validation = validateEmail(email);
+  if (!validation.valid) { document.getElementById('signup-email-err').textContent = validation.message; hasErr = true; }
+  else document.getElementById('signup-email-err').textContent = '';
+
+  if (pass !== pass2) { document.getElementById('signup-pass2-err').textContent = 'Passwords do not match'; hasErr = true; }
+  else document.getElementById('signup-pass2-err').textContent = '';
+
+  if (hasErr) return;
+
+  const btn = document.getElementById('signup-btn');
+  btn.textContent = 'Creating account...'; btn.disabled = true;
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const brand = getBrandFromEmail(email);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      uid: cred.user.uid,
+      name, email,
+      brand,
+      role: 'employee',
+      status: 'active',
+      dealership: null,
+      dealershipName: null,
+      createdAt: serverTimestamp()
+    });
+    await auth.signOut();
+    successEl.textContent = '✅ Account created! You can now sign in.';
+    successEl.classList.remove('hidden');
+    document.getElementById('signup-form').reset();
+    setTimeout(() => { document.querySelectorAll('.tab-btn')[0].click(); }, 2000);
+  } catch (err) {
+    let msg = err.message;
+    if (msg.includes('email-already-in-use')) msg = 'This email is already registered.';
+    errEl.textContent = msg; errEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Create Account'; btn.disabled = false;
+});
+</script>
+</body>
+</html>

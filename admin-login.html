@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Lotus Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.auth-hint { font-size:0.8rem; font-weight:700; color:var(--text-muted); background:var(--bg); box-shadow:var(--nm-in); border-radius:8px; padding:10px 14px; }
+.auth-hint strong { color:var(--primary); }
+.pending-notice { background:rgba(244,162,97,0.15); border:1px solid var(--warning); border-radius:12px; padding:16px 18px; }
+.pending-notice h4 { color:#b5541a; font-size:0.95rem; margin-bottom:4px; }
+.pending-notice p { color:#8a4510; font-size:0.82rem; font-weight:600; }
+</style>
+</head>
+<body>
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <p style="font-weight:800;color:var(--text-muted);">Loading...</p>
+</div>
+
+<div class="auth-page">
+  <!-- Left Panel -->
+  <div class="auth-panel-left">
+    <div class="auth-brand">
+      <div class="logo-mark">⚙</div>
+      <h2>Admin Dashboard</h2>
+      <p>Full control over brands, dealerships, employees, targets and performance monitoring.</p>
+      <div style="margin-top:40px;text-align:left;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">🏢</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:0.9rem;">Manage Brands & Dealerships</div>
+              <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:600;">Full CRUD with brand mapping</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">👥</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:0.9rem;">Manage Employees</div>
+              <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:600;">Assign roles and dealerships</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">🎯</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:0.9rem;">Set Targets & Monitor</div>
+              <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:600;">Daily, monthly and yearly goals</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✅</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:0.9rem;">Approve Admin Requests</div>
+              <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:600;">Review pending admin accounts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="auth-panel-right">
+    <div class="auth-form-wrap">
+      <div class="auth-back" onclick="window.location.href='index.html'">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Home
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="tabs auth-tabs" data-tabs>
+        <button class="tab-btn" data-tab="admin-tab-login">Sign In</button>
+        <button class="tab-btn" data-tab="admin-tab-signup">Sign Up</button>
+      </div>
+
+      <!-- Sign In Tab -->
+      <div id="admin-tab-login" class="tab-content">
+        <h2 class="auth-title mt-2">Admin Sign In</h2>
+        <p class="auth-subtitle">Access your admin dashboard</p>
+
+        <div class="auth-hint mb-2">
+          <strong>Allowed emails:</strong> @lhmail.com (Hyundai) or @lvmail.com (Vinfast)
+        </div>
+
+        <form id="admin-login-form" class="auth-form">
+          <div class="form-group">
+            <label>Admin Email</label>
+            <input type="email" id="admin-email" class="form-control" placeholder="yourname@lhmail.com" required>
+            <span class="form-error" id="admin-email-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="admin-pass" class="form-control" placeholder="Enter your password" required>
+          </div>
+          <div id="admin-login-error" class="alert alert-danger hidden"></div>
+          <button type="submit" class="btn btn-primary btn-wide" id="admin-login-btn">Sign In as Admin</button>
+          <p class="text-center" style="font-size:0.85rem;color:var(--text-muted);">
+            Don't have an account? <a class="auth-link" id="go-admin-signup">Request admin access</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Sign Up Tab -->
+      <div id="admin-tab-signup" class="tab-content">
+        <h2 class="auth-title mt-2">Request Admin Access</h2>
+        <p class="auth-subtitle">Your request will be reviewed by an existing admin</p>
+
+        <div class="pending-notice mb-2">
+          <h4>⏳ Requires Approval</h4>
+          <p>New admin accounts are pending until an existing admin approves your request. You'll be notified once approved.</p>
+        </div>
+
+        <div class="auth-hint mb-2">
+          <strong>Allowed emails:</strong> @lhmail.com (Hyundai) or @lvmail.com (Vinfast)
+        </div>
+
+        <form id="admin-signup-form" class="auth-form">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="admin-signup-name" class="form-control" placeholder="Your full name" required>
+            <span class="form-error" id="admin-name-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Work Email</label>
+            <input type="email" id="admin-signup-email" class="form-control" placeholder="yourname@lhmail.com" required>
+            <span class="form-error" id="admin-signup-email-err"></span>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="admin-signup-pass" class="form-control" placeholder="Min 6 characters" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="admin-signup-pass2" class="form-control" placeholder="Repeat password" required>
+            <span class="form-error" id="admin-pass2-err"></span>
+          </div>
+          <div id="admin-signup-error" class="alert alert-danger hidden"></div>
+          <div id="admin-signup-success" class="alert alert-success hidden"></div>
+          <button type="submit" class="btn btn-primary btn-wide" id="admin-signup-btn">Submit Request</button>
+          <p class="text-center" style="font-size:0.85rem;color:var(--text-muted);">
+            Already have an account? <a class="auth-link" id="go-admin-login">Sign in here</a>
+          </p>
+        </form>
+      </div>
+
+      <div style="margin-top:32px;padding-top:20px;border-top:1px solid var(--border);text-align:center;font-size:0.75rem;color:var(--text-muted);font-weight:700;">
+        Developed by <strong>Dharun Kumar N</strong> ( SEO &amp; ORM Analyst @ Lotus Hyundai HO )
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { auth, db, validateEmail, getBrandFromEmail } from './js/firebase-config.js';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  doc, setDoc, getDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { showToast, initTabs } from './js/utils.js';
+
+document.getElementById('loading-overlay').style.display = 'none';
+initTabs('[data-tabs]');
+
+document.getElementById('go-admin-signup')?.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn')[1].click();
+});
+document.getElementById('go-admin-login')?.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn')[0].click();
+});
+
+// ── Admin Login ──
+document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('admin-email').value.trim();
+  const pass = document.getElementById('admin-pass').value;
+  const errEl = document.getElementById('admin-login-error');
+  errEl.classList.add('hidden');
+
+  const validation = validateEmail(email);
+  if (!validation.valid) {
+    document.getElementById('admin-email-err').textContent = validation.message;
+    return;
+  }
+  document.getElementById('admin-email-err').textContent = '';
+
+  const btn = document.getElementById('admin-login-btn');
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    const snap = await getDoc(doc(db, 'users', cred.user.uid));
+    if (!snap.exists()) throw new Error('Admin account not found.');
+    const userData = snap.data();
+    if (userData.role === 'employee') {
+      await auth.signOut();
+      throw new Error('This is the admin portal. Please use the Employee portal.');
+    }
+    if (userData.role === 'admin-pending') {
+      await auth.signOut();
+      throw new Error('Your admin request is pending approval. Please wait for an admin to approve.');
+    }
+    if (userData.status === 'suspended') {
+      await auth.signOut();
+      throw new Error('Your account has been suspended.');
+    }
+    sessionStorage.setItem('lotus_user', JSON.stringify({
+      uid: cred.user.uid, ...userData
+    }));
+    showToast('Admin signed in!', 'success');
+    setTimeout(() => window.location.href = 'admin-dashboard.html', 800);
+  } catch (err) {
+    let msg = err.message;
+    if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) msg = 'Invalid email or password.';
+    errEl.textContent = msg; errEl.classList.remove('hidden');
+    btn.textContent = 'Sign In as Admin'; btn.disabled = false;
+  }
+});
+
+// ── Admin Sign Up ──
+document.getElementById('admin-signup-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('admin-signup-name').value.trim();
+  const email = document.getElementById('admin-signup-email').value.trim();
+  const pass = document.getElementById('admin-signup-pass').value;
+  const pass2 = document.getElementById('admin-signup-pass2').value;
+  const errEl = document.getElementById('admin-signup-error');
+  const successEl = document.getElementById('admin-signup-success');
+  errEl.classList.add('hidden'); successEl.classList.add('hidden');
+
+  let hasErr = false;
+  if (!name) { document.getElementById('admin-name-err').textContent = 'Name is required'; hasErr = true; }
+  else document.getElementById('admin-name-err').textContent = '';
+  const validation = validateEmail(email);
+  if (!validation.valid) { document.getElementById('admin-signup-email-err').textContent = validation.message; hasErr = true; }
+  else document.getElementById('admin-signup-email-err').textContent = '';
+  if (pass !== pass2) { document.getElementById('admin-pass2-err').textContent = 'Passwords do not match'; hasErr = true; }
+  else document.getElementById('admin-pass2-err').textContent = '';
+  if (hasErr) return;
+
+  const btn = document.getElementById('admin-signup-btn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const brand = getBrandFromEmail(email);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      uid: cred.user.uid,
+      name, email, brand,
+      role: 'admin-pending',
+      status: 'pending',
+      dealership: null,
+      dealershipName: null,
+      createdAt: serverTimestamp()
+    });
+    await auth.signOut();
+    successEl.textContent = '✅ Request submitted! An admin will review and approve your account.';
+    successEl.classList.remove('hidden');
+    document.getElementById('admin-signup-form').reset();
+  } catch (err) {
+    let msg = err.message;
+    if (msg.includes('email-already-in-use')) msg = 'This email is already registered.';
+    errEl.textContent = msg; errEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Submit Request'; btn.disabled = false;
+});
+</script>
+</body>
+</html>

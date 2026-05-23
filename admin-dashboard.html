@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Lotus</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.target-card { position:relative; overflow:hidden; }
+.target-card::before { content:''; position:absolute; top:-30px; right:-30px; width:100px; height:100px; border-radius:50%; background:rgba(0,44,95,0.06); }
+.target-pct.achieved { color:var(--success); }
+.target-pct.danger { color:var(--danger); }
+.approval-card { display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 20px;background:var(--bg);border-radius:12px;box-shadow:var(--nm-out);margin-bottom:12px; }
+.approval-info h4 { font-size:0.95rem;font-weight:800;color:var(--text);margin-bottom:2px; }
+.approval-info p { font-size:0.82rem;font-weight:700;color:var(--text-muted); }
+.approval-actions { display:flex;gap:8px; }
+.brand-tag { display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:800;letter-spacing:0.5px; }
+.brand-tag.hyundai { background:rgba(0,44,95,0.1);color:var(--primary); }
+.brand-tag.vinfast { background:rgba(0,170,210,0.1);color:var(--accent-dark); }
+.nm-card-flush { background:var(--bg);border-radius:var(--radius);box-shadow:var(--nm-out); }
+.summary-top { background:linear-gradient(135deg,var(--primary) 0%,#004a8f 100%);border-radius:var(--radius-lg);padding:28px 32px;color:#fff;margin-bottom:28px; }
+.summary-top .big { font-family:'Barlow Condensed',sans-serif;font-size:3.5rem;font-weight:900;line-height:1; }
+.summary-top .lbl { font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.7); }
+.admin-section-title { font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:900;color:var(--primary);margin-bottom:20px; }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <p style="font-weight:800;color:var(--text-muted);">Loading admin dashboard...</p>
+</div>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-text">LOTUS</div>
+    <div class="logo-sub">Admin Dashboard</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-title">Dashboard</span>
+    <button class="nav-link active" data-page="overview">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Overview
+    </button>
+    <button class="nav-link" data-page="targets">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      Targets
+    </button>
+    <span class="nav-section-title">Management</span>
+    <button class="nav-link" data-page="brands">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+      Brands
+    </button>
+    <button class="nav-link" data-page="dealerships">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+      Dealerships
+    </button>
+    <button class="nav-link" data-page="employees">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      Employees
+    </button>
+    <button class="nav-link" data-page="reviews">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      All Reviews
+    </button>
+    <span class="nav-section-title">Admin</span>
+    <button class="nav-link" data-page="approvals">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Approvals <span id="approval-badge" class="badge badge-danger" style="margin-left:4px;display:none;">0</span>
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-avatar">A</div>
+      <div class="sidebar-user-info">
+        <div class="name" id="sb-name">Admin</div>
+        <div class="role">Administrator</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm w-full" id="logout-btn" style="color:rgba(255,255,255,0.7);margin-top:10px;">Sign Out</button>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main-layout">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      <div>
+        <div class="topbar-title" id="page-title">Overview</div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);" id="topbar-sub">Admin Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge badge-primary" id="topbar-brand">Lotus</span>
+      <span class="badge badge-success">Admin</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- ══════════════ OVERVIEW ══════════════ -->
+    <div id="page-overview">
+      <div class="grid grid-4 mb-3" id="admin-stat-row">
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(0,170,210,0.12);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-total-today">—</div>
+          <div class="stat-label">Today (All)</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(0,44,95,0.08);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-total-month">—</div>
+          <div class="stat-label">This Month</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(45,198,83,0.12);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--success)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-emp-count">—</div>
+          <div class="stat-label">Employees</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(244,162,97,0.15);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--warning)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+          <div class="stat-value" id="ov-dealer-count">—</div>
+          <div class="stat-label">Dealerships</div>
+        </div>
+      </div>
+
+      <!-- Target Progress Overview -->
+      <div class="nm-card mb-3 target-card">
+        <h3 class="mb-3">Target Achievement Overview</h3>
+        <div class="grid grid-3" id="target-progress-overview">
+          <div>
+            <div class="target-header">
+              <h4>Daily Target</h4>
+              <div class="target-pct" id="daily-pct">—%</div>
+            </div>
+            <div class="progress-wrap"><div class="progress-bar" id="daily-bar" style="width:0%"></div></div>
+            <div class="target-nums" id="daily-nums">— / — reviews</div>
+          </div>
+          <div>
+            <div class="target-header">
+              <h4>Monthly Target</h4>
+              <div class="target-pct" id="monthly-pct">—%</div>
+            </div>
+            <div class="progress-wrap"><div class="progress-bar" id="monthly-bar" style="width:0%"></div></div>
+            <div class="target-nums" id="monthly-nums">— / — reviews</div>
+          </div>
+          <div>
+            <div class="target-header">
+              <h4>Yearly Target</h4>
+              <div class="target-pct" id="yearly-pct">—%</div>
+            </div>
+            <div class="progress-wrap"><div class="progress-bar" id="yearly-bar" style="width:0%"></div></div>
+            <div class="target-nums" id="yearly-nums">— / — reviews</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-Brand Breakdown -->
+      <div class="grid grid-2">
+        <div class="nm-card">
+          <h3 class="mb-2">
+            <span class="brand-tag hyundai">🚗 Lotus Hyundai</span>
+          </h3>
+          <div id="hyundai-overview">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:2.5rem;font-weight:900;color:var(--primary);" id="hyundai-month-total">—</div>
+            <div style="font-size:0.8rem;font-weight:800;color:var(--text-muted);letter-spacing:0.5px;">reviews this month</div>
+          </div>
+        </div>
+        <div class="nm-card">
+          <h3 class="mb-2">
+            <span class="brand-tag vinfast">🚘 Lotus Vinfast</span>
+          </h3>
+          <div id="vinfast-overview">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:2.5rem;font-weight:900;color:var(--accent);" id="vinfast-month-total">—</div>
+            <div style="font-size:0.8rem;font-weight:800;color:var(--text-muted);letter-spacing:0.5px;">reviews this month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Employees -->
+      <div class="nm-card mt-3">
+        <div class="flex justify-between items-center mb-2">
+          <h3>Top Performers This Month</h3>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Employee</th><th>Brand</th><th>Dealership</th><th>Reviews</th></tr></thead>
+            <tbody id="top-employees-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ TARGETS ══════════════ -->
+    <div id="page-targets" class="hidden">
+      <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:12px;">
+        <h2 style="color:var(--primary);">Target Management</h2>
+        <button class="btn btn-primary" id="add-target-btn">+ Set New Target</button>
+      </div>
+
+      <div class="nm-card mb-3">
+        <h3 class="mb-3">Current Performance vs Targets</h3>
+        <div id="target-detail-list">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <div class="nm-card">
+        <div class="flex justify-between items-center mb-2">
+          <h3>All Targets</h3>
+          <div class="filter-row">
+            <select id="target-brand-filter" class="form-control">
+              <option value="">All Brands</option>
+              <option value="Lotus Hyundai">Lotus Hyundai</option>
+              <option value="Lotus Vinfast">Lotus Vinfast</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Type</th><th>Brand</th><th>Target</th><th>Period</th><th>Set By</th><th>Actions</th></tr></thead>
+            <tbody id="targets-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ BRANDS ══════════════ -->
+    <div id="page-brands" class="hidden">
+      <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:12px;">
+        <h2 style="color:var(--primary);">Brand Management</h2>
+        <button class="btn btn-primary" id="add-brand-btn">+ Add Brand</button>
+      </div>
+      <div class="nm-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Brand Name</th><th>Email Domain</th><th>Dealerships</th><th>Employees</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="brands-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ DEALERSHIPS ══════════════ -->
+    <div id="page-dealerships" class="hidden">
+      <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:12px;">
+        <h2 style="color:var(--primary);">Dealership Management</h2>
+        <button class="btn btn-primary" id="add-dealer-btn">+ Add Dealership</button>
+      </div>
+      <div class="filter-row mb-3">
+        <select id="dealer-brand-filter" class="form-control">
+          <option value="">All Brands</option>
+        </select>
+        <div class="search-box">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="dealer-search" class="form-control" placeholder="Search dealerships...">
+        </div>
+      </div>
+      <div class="nm-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Dealership Name</th><th>Brand</th><th>Location</th><th>Employees</th><th>This Month</th><th>Actions</th></tr></thead>
+            <tbody id="dealers-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ EMPLOYEES ══════════════ -->
+    <div id="page-employees" class="hidden">
+      <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:12px;">
+        <h2 style="color:var(--primary);">Employee Management</h2>
+      </div>
+      <div class="filter-row mb-3">
+        <select id="emp-brand-filter" class="form-control">
+          <option value="">All Brands</option>
+          <option value="Lotus Hyundai">Lotus Hyundai</option>
+          <option value="Lotus Vinfast">Lotus Vinfast</option>
+        </select>
+        <select id="emp-dealer-filter" class="form-control">
+          <option value="">All Dealerships</option>
+        </select>
+        <div class="search-box">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="emp-search" class="form-control" placeholder="Search employees...">
+        </div>
+        <button class="btn btn-primary btn-sm" id="emp-filter-btn">Filter</button>
+      </div>
+      <div class="nm-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Brand</th><th>Dealership</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="employees-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ ALL REVIEWS ══════════════ -->
+    <div id="page-reviews" class="hidden">
+      <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:12px;">
+        <h2 style="color:var(--primary);">All Review Records</h2>
+        <div class="filter-row">
+          <input type="month" id="reviews-month-filter" class="form-control" style="width:auto;">
+          <select id="reviews-brand-filter" class="form-control">
+            <option value="">All Brands</option>
+            <option value="Lotus Hyundai">Lotus Hyundai</option>
+            <option value="Lotus Vinfast">Lotus Vinfast</option>
+          </select>
+          <button class="btn btn-primary btn-sm" id="reviews-filter-btn">Filter</button>
+        </div>
+      </div>
+      <div class="nm-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Employee</th><th>Brand</th><th>Dealership</th><th>Reviews</th></tr></thead>
+            <tbody id="all-reviews-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ APPROVALS ══════════════ -->
+    <div id="page-approvals" class="hidden">
+      <div class="flex justify-between items-center mb-3">
+        <h2 style="color:var(--primary);">Admin Approval Requests</h2>
+        <button class="btn btn-ghost btn-sm" id="refresh-approvals-btn">Refresh</button>
+      </div>
+      <div id="approvals-list">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+  </div>
+  <footer class="page-footer">
+    Developed by <strong>Dharun Kumar N</strong> ( SEO &amp; ORM Analyst @ Lotus Hyundai HO )
+  </footer>
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Brand Modal -->
+<div class="modal-overlay" id="brand-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="brand-modal-title">Add Brand</span>
+      <button class="modal-close" onclick="closeModal('brand-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="brand-id">
+      <div class="form-group">
+        <label>Brand Name</label>
+        <input type="text" id="brand-name" class="form-control" placeholder="e.g. Lotus Hyundai">
+      </div>
+      <div class="form-group">
+        <label>Email Domain</label>
+        <input type="text" id="brand-domain" class="form-control" placeholder="e.g. lhmail.com">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="brand-desc" class="form-control" rows="3" placeholder="Brand description..."></textarea>
+      </div>
+      <div id="brand-msg" class="alert hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('brand-modal')">Cancel</button>
+      <button class="btn btn-primary" id="brand-save-btn">Save Brand</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dealership Modal -->
+<div class="modal-overlay" id="dealer-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="dealer-modal-title">Add Dealership</span>
+      <button class="modal-close" onclick="closeModal('dealer-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="dealer-id">
+      <div class="form-group">
+        <label>Dealership Name</label>
+        <input type="text" id="dealer-name" class="form-control" placeholder="e.g. Lotus Hyundai Anna Nagar">
+      </div>
+      <div class="form-group">
+        <label>Brand</label>
+        <select id="dealer-brand" class="form-control">
+          <option value="">Select Brand</option>
+          <option value="Lotus Hyundai">Lotus Hyundai</option>
+          <option value="Lotus Vinfast">Lotus Vinfast</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Location / City</label>
+        <input type="text" id="dealer-location" class="form-control" placeholder="e.g. Chennai">
+      </div>
+      <div class="form-group">
+        <label>Full Address</label>
+        <textarea id="dealer-address" class="form-control" rows="3" placeholder="Full address..."></textarea>
+      </div>
+      <div id="dealer-msg" class="alert hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('dealer-modal')">Cancel</button>
+      <button class="btn btn-primary" id="dealer-save-btn">Save Dealership</button>
+    </div>
+  </div>
+</div>
+
+<!-- Employee Edit Modal -->
+<div class="modal-overlay" id="employee-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Employee</span>
+      <button class="modal-close" onclick="closeModal('employee-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="emp-edit-id">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="emp-edit-name" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="text" id="emp-edit-email" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label>Brand</label>
+        <input type="text" id="emp-edit-brand" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label>Assign Dealership</label>
+        <select id="emp-edit-dealer" class="form-control">
+          <option value="">No Dealership</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="emp-edit-role" class="form-control">
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="emp-edit-status" class="form-control">
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+        </select>
+      </div>
+      <div id="emp-edit-msg" class="alert hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('employee-modal')">Cancel</button>
+      <button class="btn btn-primary" id="emp-save-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Target Modal -->
+<div class="modal-overlay" id="target-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="target-modal-title">Set Target</span>
+      <button class="modal-close" onclick="closeModal('target-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="target-edit-id">
+      <div class="form-group">
+        <label>Target Type</label>
+        <select id="target-type" class="form-control">
+          <option value="daily">Daily</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Brand</label>
+        <select id="target-brand" class="form-control">
+          <option value="">All Brands (Combined)</option>
+          <option value="Lotus Hyundai">Lotus Hyundai</option>
+          <option value="Lotus Vinfast">Lotus Vinfast</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Target Value (Reviews)</label>
+        <input type="number" id="target-value" class="form-control" placeholder="e.g. 50" min="1">
+      </div>
+      <div class="form-group" id="target-period-group">
+        <label>Period</label>
+        <input type="text" id="target-period" class="form-control" placeholder="e.g. 2025-06 or 2025">
+      </div>
+      <div id="target-msg" class="alert hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('target-modal')">Cancel</button>
+      <button class="btn btn-primary" id="target-save-btn">Save Target</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <span class="modal-title" style="color:var(--danger);">Confirm Delete</span>
+      <button class="modal-close" onclick="closeModal('delete-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="delete-msg-text" style="font-size:1rem;font-weight:700;">Are you sure you want to delete this?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn btn-danger" id="delete-confirm-btn">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
+  query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { showToast, openModal, closeModal, initSidebar, getInitials, formatDate, todayStr, monthStr, yearStr, getMonthName, numFmt, updateProgressBar, showConfetti, showDangerAlert } from './js/utils.js';
+
+window.closeModal = closeModal;
+
+let currentUser = null;
+let allDealerships = [];
+let allBrands = [];
+let allEmployees = [];
+let allReviews = [];
+let allTargets = [];
+let deleteCallback = null;
+
+// ── Auth ──
+onAuthStateChanged(auth, async (fu) => {
+  if (!fu) { window.location.href = 'admin-login.html'; return; }
+  const snap = await getDoc(doc(db, 'users', fu.uid));
+  if (!snap.exists()) { await signOut(auth); window.location.href = 'admin-login.html'; return; }
+  const ud = snap.data();
+  if (ud.role !== 'admin') { await signOut(auth); window.location.href = 'admin-login.html'; return; }
+  currentUser = { uid: fu.uid, ...ud };
+  initUI();
+});
+
+async function initUI() {
+  document.getElementById('sb-avatar').textContent = getInitials(currentUser.name);
+  document.getElementById('sb-name').textContent = currentUser.name;
+  document.getElementById('topbar-brand').textContent = currentUser.brand || 'Lotus';
+  initSidebar();
+
+  document.querySelectorAll('.nav-link[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => goToPage(btn.dataset.page));
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = 'admin-login.html';
+  });
+
+  // Modals
+  document.getElementById('add-brand-btn')?.addEventListener('click', () => openBrandModal());
+  document.getElementById('add-dealer-btn')?.addEventListener('click', () => openDealerModal());
+  document.getElementById('add-target-btn')?.addEventListener('click', () => openTargetModal());
+
+  document.getElementById('brand-save-btn').addEventListener('click', saveBrand);
+  document.getElementById('dealer-save-btn').addEventListener('click', saveDealership);
+  document.getElementById('emp-save-btn').addEventListener('click', saveEmployee);
+  document.getElementById('target-save-btn').addEventListener('click', saveTarget);
+  document.getElementById('delete-confirm-btn').addEventListener('click', () => { if (deleteCallback) deleteCallback(); });
+
+  document.getElementById('reviews-filter-btn')?.addEventListener('click', loadAllReviews);
+  document.getElementById('emp-filter-btn')?.addEventListener('click', renderEmployees);
+  document.getElementById('refresh-approvals-btn')?.addEventListener('click', loadApprovals);
+  document.getElementById('target-brand-filter')?.addEventListener('change', loadTargets);
+
+  document.getElementById('dealer-search')?.addEventListener('input', renderDealerships);
+  document.getElementById('dealer-brand-filter')?.addEventListener('change', renderDealerships);
+  document.getElementById('emp-search')?.addEventListener('input', renderEmployees);
+
+  document.getElementById('reviews-month-filter').value = monthStr();
+
+  await loadAllData();
+  document.getElementById('loading-overlay').style.display = 'none';
+  loadOverview();
+  checkApprovalBadge();
+}
+
+async function loadAllData() {
+  await Promise.all([
+    loadBrands(), loadDealerships(), loadEmployees(), loadReviews(), loadTargets()
+  ]);
+}
+
+// ── Navigation ──
+window.goToPage = function(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('hidden'));
+  document.getElementById('page-' + page)?.classList.remove('hidden');
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.nav-link[data-page="${page}"]`)?.classList.add('active');
+  const titles = { overview:'Overview', targets:'Targets', brands:'Brands', dealerships:'Dealerships', employees:'Employees', reviews:'All Reviews', approvals:'Approvals' };
+  document.getElementById('page-title').textContent = titles[page] || page;
+  if (page === 'brands') renderBrands();
+  if (page === 'dealerships') renderDealerships();
+  if (page === 'employees') renderEmployees();
+  if (page === 'reviews') loadAllReviews();
+  if (page === 'approvals') loadApprovals();
+  if (page === 'targets') renderTargetDetail();
+  if (page === 'overview') loadOverview();
+};
+
+// ═══════════════════════════════════
+// DATA LOADERS
+// ═══════════════════════════════════
+async function loadBrands() {
+  const snap = await getDocs(collection(db, 'brands'));
+  allBrands = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadDealerships() {
+  const snap = await getDocs(query(collection(db, 'dealerships'), orderBy('name')));
+  allDealerships = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  // Populate filter selects
+  const bFilter = document.getElementById('dealer-brand-filter');
+  if (bFilter) {
+    const brands = [...new Set(allDealerships.map(d=>d.brand).filter(Boolean))];
+    bFilter.innerHTML = `<option value="">All Brands</option>` + brands.map(b=>`<option value="${b}">${b}</option>`).join('');
+  }
+  const empDealerFilter = document.getElementById('emp-dealer-filter');
+  if (empDealerFilter) {
+    empDealerFilter.innerHTML = `<option value="">All Dealerships</option>` + allDealerships.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  }
+}
+async function loadEmployees() {
+  const snap = await getDocs(collection(db, 'users'));
+  allEmployees = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadReviews() {
+  const snap = await getDocs(query(collection(db, 'reviews'), orderBy('date', 'desc')));
+  allReviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadTargets() {
+  const snap = await getDocs(collection(db, 'targets'));
+  allTargets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (document.getElementById('page-targets')?.classList.contains('hidden') === false) {
+    renderTargetDetail();
+    renderTargetTable();
+  }
+}
+
+// ═══════════════════════════════════
+// OVERVIEW
+// ═══════════════════════════════════
+function loadOverview() {
+  const today = todayStr();
+  const month = monthStr();
+  const year = yearStr();
+
+  const employees = allEmployees.filter(e => e.role === 'employee');
+  const todayReviews = allReviews.filter(r => r.date === today).reduce((s,r) => s+(r.count||0), 0);
+  const monthReviews = allReviews.filter(r => r.date?.startsWith(month)).reduce((s,r) => s+(r.count||0), 0);
+  const yearReviews = allReviews.filter(r => r.date?.startsWith(year)).reduce((s,r) => s+(r.count||0), 0);
+
+  document.getElementById('ov-total-today').textContent = numFmt(todayReviews);
+  document.getElementById('ov-total-month').textContent = numFmt(monthReviews);
+  document.getElementById('ov-emp-count').textContent = numFmt(employees.length);
+  document.getElementById('ov-dealer-count').textContent = numFmt(allDealerships.length);
+
+  // Brand breakdown
+  const hyundaiMonth = allReviews.filter(r => r.date?.startsWith(month) && r.brandName === 'Lotus Hyundai').reduce((s,r)=>s+(r.count||0),0);
+  const vinfastMonth = allReviews.filter(r => r.date?.startsWith(month) && r.brandName === 'Lotus Vinfast').reduce((s,r)=>s+(r.count||0),0);
+  document.getElementById('hyundai-month-total').textContent = numFmt(hyundaiMonth);
+  document.getElementById('vinfast-month-total').textContent = numFmt(vinfastMonth);
+
+  // Target Progress
+  const dailyTarget = getTarget('daily', '', today);
+  const monthlyTarget = getTarget('monthly', '', month);
+  const yearlyTarget = getTarget('yearly', '', year);
+
+  updateTargetBar('daily-bar','daily-pct','daily-nums', todayReviews, dailyTarget);
+  updateTargetBar('monthly-bar','monthly-pct','monthly-nums', monthReviews, monthlyTarget);
+  updateTargetBar('yearly-bar','yearly-pct','yearly-nums', yearReviews, yearlyTarget);
+
+  // Top employees
+  const empMap = {};
+  allReviews.filter(r => r.date?.startsWith(month)).forEach(r => {
+    if (!empMap[r.employeeId]) empMap[r.employeeId] = { name: r.employeeName, brand: r.brandName, dealership: r.dealershipName, total: 0 };
+    empMap[r.employeeId].total += (r.count || 0);
+  });
+  const top = Object.values(empMap).sort((a,b) => b.total - a.total).slice(0, 8);
+  const tbody = document.getElementById('top-employees-tbody');
+  if (!top.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No review data yet</td></tr>`;
+  } else {
+    tbody.innerHTML = top.map((e, i) => `
+      <tr>
+        <td><strong>#${i+1}</strong></td>
+        <td>${e.name}</td>
+        <td>${e.brand || '—'}</td>
+        <td>${e.dealership || '—'}</td>
+        <td><span class="badge badge-accent" style="font-size:0.95rem;">${numFmt(e.total)}</span></td>
+      </tr>
+    `).join('');
+  }
+}
+
+function getTarget(type, brand, period) {
+  let targets = allTargets.filter(t => t.type === type);
+  if (brand) targets = targets.filter(t => t.brand === brand);
+  // Match period
+  if (type === 'daily') targets = targets.filter(t => !t.period || t.period === period);
+  else if (type === 'monthly') targets = targets.filter(t => !t.period || period.startsWith(t.period));
+  else if (type === 'yearly') targets = targets.filter(t => !t.period || period.startsWith(t.period));
+  return targets.length ? targets[targets.length-1].value : 0;
+}
+
+function updateTargetBar(barId, pctId, numsId, current, target) {
+  const pct = target > 0 ? Math.min(Math.round((current/target)*100), 100) : 0;
+  const bar = document.getElementById(barId);
+  const pctEl = document.getElementById(pctId);
+  const numsEl = document.getElementById(numsId);
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) { pctEl.textContent = pct + '%'; pctEl.className = 'target-pct ' + (pct >= 100 ? 'achieved' : 'danger'); }
+  if (numsEl) numsEl.textContent = `${numFmt(current)} / ${target > 0 ? numFmt(target) : 'No target'} reviews`;
+  return pct;
+}
+
+// ═══════════════════════════════════
+// TARGETS
+// ═══════════════════════════════════
+function renderTargetDetail() {
+  const today = todayStr();
+  const month = monthStr();
+  const year = yearStr();
+  const brandFilter = document.getElementById('target-brand-filter')?.value || '';
+
+  const types = [
+    { key: 'daily', label: 'Daily Target', period: today, current: allReviews.filter(r=>r.date===today && (!brandFilter||r.brandName===brandFilter)).reduce((s,r)=>s+(r.count||0),0) },
+    { key: 'monthly', label: 'Monthly Target', period: month, current: allReviews.filter(r=>r.date?.startsWith(month) && (!brandFilter||r.brandName===brandFilter)).reduce((s,r)=>s+(r.count||0),0) },
+    { key: 'yearly', label: 'Yearly Target', period: year, current: allReviews.filter(r=>r.date?.startsWith(year) && (!brandFilter||r.brandName===brandFilter)).reduce((s,r)=>s+(r.count||0),0) }
+  ];
+
+  const el = document.getElementById('target-detail-list');
+  el.innerHTML = types.map(t => {
+    const tv = getTarget(t.key, brandFilter, t.period);
+    const pct = tv > 0 ? Math.min(Math.round((t.current/tv)*100),100) : 0;
+    const achieved = pct >= 100;
+    return `
+      <div class="target-block">
+        <div class="target-header">
+          <h4>${t.label}</h4>
+          <div class="target-pct ${achieved?'achieved':'danger'}">${pct}%</div>
+        </div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;${achieved?'background:var(--success);':''}"></div></div>
+        <div class="target-nums">${numFmt(t.current)} / ${tv>0?numFmt(tv):'Not set'} reviews &nbsp;|&nbsp; Period: ${t.period}</div>
+        ${achieved ? `<div class="alert alert-success mt-1">🎉 Target achieved! Well done!</div>` : tv > 0 ? `<div class="alert alert-danger mt-1">⚠️ ${numFmt(tv - t.current)} more reviews needed to reach target</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  renderTargetTable();
+}
+
+function renderTargetTable() {
+  const brandFilter = document.getElementById('target-brand-filter')?.value || '';
+  let targets = allTargets;
+  if (brandFilter) targets = targets.filter(t => t.brand === brandFilter || t.brand === '');
+  const tbody = document.getElementById('targets-tbody');
+  if (!targets.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No targets set yet</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = targets.map(t => `
+    <tr>
+      <td><span class="badge badge-primary">${t.type?.toUpperCase()}</span></td>
+      <td>${t.brand || 'All Brands'}</td>
+      <td><strong>${numFmt(t.value)}</strong> reviews</td>
+      <td>${t.period || '—'}</td>
+      <td>${t.setBy || '—'}</td>
+      <td class="actions">
+        <button class="btn btn-sm btn-primary" onclick="openTargetModal('${t.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDelete('targets','${t.id}','this target')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.openTargetModal = function(id = null) {
+  document.getElementById('target-edit-id').value = id || '';
+  if (id) {
+    const t = allTargets.find(x => x.id === id);
+    if (t) {
+      document.getElementById('target-type').value = t.type || 'daily';
+      document.getElementById('target-brand').value = t.brand || '';
+      document.getElementById('target-value').value = t.value || '';
+      document.getElementById('target-period').value = t.period || '';
+    }
+    document.getElementById('target-modal-title').textContent = 'Edit Target';
+  } else {
+    document.getElementById('target-type').value = 'daily';
+    document.getElementById('target-brand').value = '';
+    document.getElementById('target-value').value = '';
+    document.getElementById('target-period').value = monthStr();
+    document.getElementById('target-modal-title').textContent = 'Set New Target';
+  }
+  document.getElementById('target-msg').classList.add('hidden');
+  openModal('target-modal');
+};
+
+async function saveTarget() {
+  const id = document.getElementById('target-edit-id').value;
+  const type = document.getElementById('target-type').value;
+  const brand = document.getElementById('target-brand').value;
+  const value = parseInt(document.getElementById('target-value').value);
+  const period = document.getElementById('target-period').value.trim();
+  const msgEl = document.getElementById('target-msg');
+  if (!value || value < 1) { msgEl.textContent = 'Please enter a valid target value.'; msgEl.className = 'alert alert-danger'; msgEl.classList.remove('hidden'); return; }
+
+  const btn = document.getElementById('target-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    const data = { type, brand, value, period, setBy: currentUser.name, updatedAt: serverTimestamp() };
+    if (id) await updateDoc(doc(db, 'targets', id), data);
+    else await addDoc(collection(db, 'targets'), { ...data, createdAt: serverTimestamp() });
+    showToast('Target saved!', 'success');
+    closeModal('target-modal');
+    await loadTargets();
+    renderTargetDetail();
+
+    // Check if current achievement triggers confetti/alert
+    const month = monthStr();
+    const monthTotal = allReviews.filter(r=>r.date?.startsWith(month)).reduce((s,r)=>s+(r.count||0),0);
+    if (type === 'monthly' && monthTotal >= value) showConfetti('🎯 Monthly Target Achieved!', `You've reached ${numFmt(monthTotal)} reviews this month!`);
+  } catch(e) {
+    msgEl.textContent = e.message; msgEl.className = 'alert alert-danger'; msgEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Save Target'; btn.disabled = false;
+}
+
+// ═══════════════════════════════════
+// BRANDS
+// ═══════════════════════════════════
+function renderBrands() {
+  const tbody = document.getElementById('brands-tbody');
+  if (!allBrands.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No brands yet. Add one!</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = allBrands.map(b => {
+    const dealerCount = allDealerships.filter(d => d.brand === b.name).length;
+    const empCount = allEmployees.filter(e => e.brand === b.name).length;
+    return `
+      <tr>
+        <td><strong>${b.name}</strong></td>
+        <td><code style="background:var(--bg);box-shadow:var(--nm-in);padding:2px 8px;border-radius:6px;font-size:0.85rem;">@${b.domain || '—'}</code></td>
+        <td>${dealerCount}</td>
+        <td>${empCount}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted);">${b.createdAt?.toDate ? formatDate(b.createdAt.toDate()) : '—'}</td>
+        <td class="actions">
+          <button class="btn btn-sm btn-primary" onclick="openBrandModal('${b.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmDelete('brands','${b.id}','brand ${b.name}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.openBrandModal = function(id = null) {
+  document.getElementById('brand-id').value = id || '';
+  if (id) {
+    const b = allBrands.find(x => x.id === id);
+    if (b) { document.getElementById('brand-name').value = b.name || ''; document.getElementById('brand-domain').value = b.domain || ''; document.getElementById('brand-desc').value = b.description || ''; }
+    document.getElementById('brand-modal-title').textContent = 'Edit Brand';
+  } else {
+    document.getElementById('brand-name').value = '';
+    document.getElementById('brand-domain').value = '';
+    document.getElementById('brand-desc').value = '';
+    document.getElementById('brand-modal-title').textContent = 'Add Brand';
+  }
+  document.getElementById('brand-msg').classList.add('hidden');
+  openModal('brand-modal');
+};
+
+async function saveBrand() {
+  const id = document.getElementById('brand-id').value;
+  const name = document.getElementById('brand-name').value.trim();
+  const domain = document.getElementById('brand-domain').value.trim();
+  const description = document.getElementById('brand-desc').value.trim();
+  const msgEl = document.getElementById('brand-msg');
+  if (!name) { msgEl.textContent = 'Brand name is required.'; msgEl.className='alert alert-danger'; msgEl.classList.remove('hidden'); return; }
+  const btn = document.getElementById('brand-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    if (id) await updateDoc(doc(db, 'brands', id), { name, domain, description, updatedAt: serverTimestamp() });
+    else await addDoc(collection(db, 'brands'), { name, domain, description, createdAt: serverTimestamp() });
+    showToast('Brand saved!', 'success');
+    closeModal('brand-modal');
+    await loadBrands();
+    renderBrands();
+  } catch(e) { msgEl.textContent = e.message; msgEl.className='alert alert-danger'; msgEl.classList.remove('hidden'); }
+  btn.textContent = 'Save Brand'; btn.disabled = false;
+}
+
+// ═══════════════════════════════════
+// DEALERSHIPS
+// ═══════════════════════════════════
+function renderDealerships() {
+  const brandFilter = document.getElementById('dealer-brand-filter')?.value || '';
+  const search = document.getElementById('dealer-search')?.value?.toLowerCase() || '';
+  const month = monthStr();
+  let dealers = allDealerships;
+  if (brandFilter) dealers = dealers.filter(d => d.brand === brandFilter);
+  if (search) dealers = dealers.filter(d => d.name?.toLowerCase().includes(search) || d.location?.toLowerCase().includes(search));
+  const tbody = document.getElementById('dealers-tbody');
+  if (!dealers.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No dealerships found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = dealers.map(d => {
+    const empCount = allEmployees.filter(e => e.dealership === d.id).length;
+    const monthRev = allReviews.filter(r => r.date?.startsWith(month) && r.dealership === d.id).reduce((s,r)=>s+(r.count||0),0);
+    const brandCls = d.brand === 'Lotus Hyundai' ? 'hyundai' : 'vinfast';
+    return `
+      <tr>
+        <td><strong>${d.name}</strong></td>
+        <td><span class="brand-tag ${brandCls}">${d.brand || '—'}</span></td>
+        <td>${d.location || '—'}</td>
+        <td>${empCount}</td>
+        <td><span class="badge badge-accent">${numFmt(monthRev)}</span></td>
+        <td class="actions">
+          <button class="btn btn-sm btn-primary" onclick="openDealerModal('${d.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmDelete('dealerships','${d.id}','dealership ${d.name}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.openDealerModal = function(id = null) {
+  document.getElementById('dealer-id').value = id || '';
+  if (id) {
+    const d = allDealerships.find(x => x.id === id);
+    if (d) {
+      document.getElementById('dealer-name').value = d.name || '';
+      document.getElementById('dealer-brand').value = d.brand || '';
+      document.getElementById('dealer-location').value = d.location || '';
+      document.getElementById('dealer-address').value = d.address || '';
+    }
+    document.getElementById('dealer-modal-title').textContent = 'Edit Dealership';
+  } else {
+    ['dealer-name','dealer-location','dealer-address'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('dealer-brand').value = '';
+    document.getElementById('dealer-modal-title').textContent = 'Add Dealership';
+  }
+  document.getElementById('dealer-msg').classList.add('hidden');
+  openModal('dealer-modal');
+};
+
+async function saveDealership() {
+  const id = document.getElementById('dealer-id').value;
+  const name = document.getElementById('dealer-name').value.trim();
+  const brand = document.getElementById('dealer-brand').value;
+  const location = document.getElementById('dealer-location').value.trim();
+  const address = document.getElementById('dealer-address').value.trim();
+  const msgEl = document.getElementById('dealer-msg');
+  if (!name || !brand) { msgEl.textContent = 'Name and brand are required.'; msgEl.className='alert alert-danger'; msgEl.classList.remove('hidden'); return; }
+  const btn = document.getElementById('dealer-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    if (id) await updateDoc(doc(db, 'dealerships', id), { name, brand, location, address, updatedAt: serverTimestamp() });
+    else await addDoc(collection(db, 'dealerships'), { name, brand, location, address, createdAt: serverTimestamp() });
+    showToast('Dealership saved!', 'success');
+    closeModal('dealer-modal');
+    await loadDealerships();
+    renderDealerships();
+  } catch(e) { msgEl.textContent = e.message; msgEl.className='alert alert-danger'; msgEl.classList.remove('hidden'); }
+  btn.textContent = 'Save Dealership'; btn.disabled = false;
+}
+
+// ═══════════════════════════════════
+// EMPLOYEES
+// ═══════════════════════════════════
+function renderEmployees() {
+  const brandFilter = document.getElementById('emp-brand-filter')?.value || '';
+  const dealerFilter = document.getElementById('emp-dealer-filter')?.value || '';
+  const search = document.getElementById('emp-search')?.value?.toLowerCase() || '';
+  let emps = allEmployees;
+  if (brandFilter) emps = emps.filter(e => e.brand === brandFilter);
+  if (dealerFilter) emps = emps.filter(e => e.dealership === dealerFilter);
+  if (search) emps = emps.filter(e => e.name?.toLowerCase().includes(search) || e.email?.toLowerCase().includes(search));
+
+  const tbody = document.getElementById('employees-tbody');
+  if (!emps.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No employees found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = emps.map(e => {
+    const roleClasses = { employee:'badge-primary', admin:'badge-success', 'admin-pending':'badge-warning' };
+    const statusClasses = { active:'badge-success', suspended:'badge-danger', pending:'badge-warning' };
+    return `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;color:#fff;flex-shrink:0;">${getInitials(e.name)}</div>
+            <strong>${e.name}</strong>
+          </div>
+        </td>
+        <td style="font-size:0.85rem;">${e.email}</td>
+        <td>${e.brand || '—'}</td>
+        <td>${e.dealershipName || '—'}</td>
+        <td><span class="badge ${roleClasses[e.role]||'badge-primary'}">${e.role || 'employee'}</span></td>
+        <td><span class="badge ${statusClasses[e.status]||'badge-primary'}">${e.status || 'active'}</span></td>
+        <td class="actions">
+          <button class="btn btn-sm btn-primary" onclick="openEmployeeModal('${e.id}')">Edit</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.openEmployeeModal = function(id) {
+  const e = allEmployees.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('emp-edit-id').value = id;
+  document.getElementById('emp-edit-name').value = e.name || '';
+  document.getElementById('emp-edit-email').value = e.email || '';
+  document.getElementById('emp-edit-brand').value = e.brand || '';
+  document.getElementById('emp-edit-role').value = e.role || 'employee';
+  document.getElementById('emp-edit-status').value = e.status || 'active';
+
+  // Populate dealer dropdown filtered by brand
+  const dealerSel = document.getElementById('emp-edit-dealer');
+  const filtered = allDealerships.filter(d => !e.brand || d.brand === e.brand);
+  dealerSel.innerHTML = `<option value="">No Dealership</option>` + filtered.map(d => `<option value="${d.id}" ${e.dealership===d.id?'selected':''}>${d.name}</option>`).join('');
+
+  document.getElementById('emp-edit-msg').classList.add('hidden');
+  openModal('employee-modal');
+};
+
+async function saveEmployee() {
+  const id = document.getElementById('emp-edit-id').value;
+  const dealerId = document.getElementById('emp-edit-dealer').value;
+  const role = document.getElementById('emp-edit-role').value;
+  const status = document.getElementById('emp-edit-status').value;
+  const msgEl = document.getElementById('emp-edit-msg');
+  const btn = document.getElementById('emp-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+
+  try {
+    const dealerName = dealerId ? (allDealerships.find(d=>d.id===dealerId)?.name || null) : null;
+    await updateDoc(doc(db, 'users', id), {
+      dealership: dealerId || null,
+      dealershipName: dealerName,
+      role, status,
+      updatedAt: serverTimestamp()
+    });
+    showToast('Employee updated!', 'success');
+    closeModal('employee-modal');
+    await loadEmployees();
+    renderEmployees();
+  } catch(e) {
+    msgEl.textContent = e.message; msgEl.className='alert alert-danger'; msgEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Save Changes'; btn.disabled = false;
+}
+
+// ═══════════════════════════════════
+// ALL REVIEWS
+// ═══════════════════════════════════
+async function loadAllReviews() {
+  const monthFilter = document.getElementById('reviews-month-filter')?.value || '';
+  const brandFilter = document.getElementById('reviews-brand-filter')?.value || '';
+  const tbody = document.getElementById('all-reviews-tbody');
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;"><div class="spinner" style="width:22px;height:22px;margin:0 auto;"></div></td></tr>`;
+  let reviews = allReviews;
+  if (monthFilter) reviews = reviews.filter(r => r.date?.startsWith(monthFilter));
+  if (brandFilter) reviews = reviews.filter(r => r.brandName === brandFilter);
+  if (!reviews.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No records found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = reviews.slice(0, 200).map(r => `
+    <tr>
+      <td><strong>${formatDate(new Date(r.date+'T00:00:00'))}</strong></td>
+      <td>${r.employeeName || '—'}</td>
+      <td>${r.brandName || '—'}</td>
+      <td>${r.dealershipName || '—'}</td>
+      <td><span class="badge badge-accent" style="font-size:0.95rem;">${numFmt(r.count||0)}</span></td>
+    </tr>
+  `).join('');
+}
+
+// ═══════════════════════════════════
+// APPROVALS
+// ═══════════════════════════════════
+async function loadApprovals() {
+  const list = document.getElementById('approvals-list');
+  list.innerHTML = '<div class="spinner"></div>';
+  const pendingAdmins = allEmployees.filter(e => e.role === 'admin-pending');
+  checkApprovalBadge();
+  if (!pendingAdmins.length) {
+    list.innerHTML = `<div class="nm-card" style="text-align:center;padding:40px;">
+      <div style="font-size:2rem;margin-bottom:12px;">✅</div>
+      <h3 style="color:var(--primary);margin-bottom:8px;">All caught up!</h3>
+      <p style="color:var(--text-muted);">No pending admin approval requests.</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = pendingAdmins.map(e => `
+    <div class="approval-card">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0;">${getInitials(e.name)}</div>
+        <div class="approval-info">
+          <h4>${e.name}</h4>
+          <p>${e.email} &nbsp;·&nbsp; <span class="badge badge-pending">Pending Admin</span> &nbsp;·&nbsp; ${e.brand || '—'}</p>
+        </div>
+      </div>
+      <div class="approval-actions">
+        <button class="btn btn-success btn-sm" onclick="approveAdmin('${e.id}','${e.name}')">✅ Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectAdmin('${e.id}','${e.name}')">❌ Reject</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function checkApprovalBadge() {
+  const count = allEmployees.filter(e => e.role === 'admin-pending').length;
+  const badge = document.getElementById('approval-badge');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-flex' : 'none';
+  }
+}
+
+window.approveAdmin = async function(id, name) {
+  try {
+    await updateDoc(doc(db, 'users', id), { role: 'admin', status: 'active', updatedAt: serverTimestamp() });
+    showToast(`${name} approved as admin!`, 'success');
+    await loadEmployees();
+    loadApprovals();
+  } catch(e) { showToast(e.message, 'error'); }
+};
+window.rejectAdmin = async function(id, name) {
+  try {
+    await updateDoc(doc(db, 'users', id), { role: 'employee', status: 'active', updatedAt: serverTimestamp() });
+    showToast(`${name}'s request rejected.`, 'warning');
+    await loadEmployees();
+    loadApprovals();
+  } catch(e) { showToast(e.message, 'error'); }
+};
+
+// ═══════════════════════════════════
+// DELETE
+// ═══════════════════════════════════
+window.confirmDelete = function(collName, id, label) {
+  document.getElementById('delete-msg-text').textContent = `Are you sure you want to delete ${label}? This cannot be undone.`;
+  deleteCallback = async () => {
+    try {
+      await deleteDoc(doc(db, collName, id));
+      showToast('Deleted successfully!', 'success');
+      closeModal('delete-modal');
+      if (collName === 'brands') { await loadBrands(); renderBrands(); }
+      if (collName === 'dealerships') { await loadDealerships(); renderDealerships(); }
+      if (collName === 'targets') { await loadTargets(); renderTargetDetail(); }
+    } catch(e) { showToast(e.message, 'error'); }
+    deleteCallback = null;
+  };
+  openModal('delete-modal');
+};
+
+// ═══════════════════════════════════
+// TARGET ACHIEVEMENT CHECK (Runs on load)
+// ═══════════════════════════════════
+function checkAndTriggerTargetAnimations() {
+  const today = todayStr();
+  const month = monthStr();
+  const year = yearStr();
+  const todayTotal = allReviews.filter(r=>r.date===today).reduce((s,r)=>s+(r.count||0),0);
+  const monthTotal = allReviews.filter(r=>r.date?.startsWith(month)).reduce((s,r)=>s+(r.count||0),0);
+  const yearTotal = allReviews.filter(r=>r.date?.startsWith(year)).reduce((s,r)=>s+(r.count||0),0);
+
+  const dailyTarget = getTarget('daily','',today);
+  const monthlyTarget = getTarget('monthly','',month);
+  const yearlyTarget = getTarget('yearly','',year);
+
+  // Only show on overview page after a fresh data load
+  const shown = sessionStorage.getItem('target_check_shown');
+  if (shown) return;
+  sessionStorage.setItem('target_check_shown', '1');
+
+  if (dailyTarget > 0 && todayTotal >= dailyTarget) {
+    setTimeout(() => showConfetti('🎉 Daily Target Achieved!', `You've collected ${numFmt(todayTotal)} reviews today!`), 1500);
+  } else if (monthlyTarget > 0 && monthTotal >= monthlyTarget) {
+    setTimeout(() => showConfetti('🏆 Monthly Target Achieved!', `Amazing! ${numFmt(monthTotal)} reviews this month!`), 1500);
+  } else if (yearlyTarget > 0 && yearTotal >= yearlyTarget) {
+    setTimeout(() => showConfetti('🥇 Yearly Target Achieved!', `Outstanding! ${numFmt(yearTotal)} reviews this year!`), 1500);
+  }
+}
+
+// Call after data loads
+setTimeout(checkAndTriggerTargetAnimations, 2000);
+</script>
+</body>
+</html>

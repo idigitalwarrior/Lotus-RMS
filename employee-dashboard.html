@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Dashboard — Lotus</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.review-count-input {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:3rem; font-weight:900; text-align:center;
+  width:140px; border:none; background:var(--bg);
+  box-shadow:var(--nm-in); border-radius:16px; padding:16px;
+  color:var(--primary); outline:none;
+}
+.review-count-input:focus { box-shadow:inset 3px 3px 8px #b8bbc7,inset -3px -3px 8px #fff,0 0 0 2px var(--accent); }
+.count-ctrl { display:flex; align-items:center; gap:20px; }
+.count-btn { width:52px;height:52px;border-radius:50%;border:none;cursor:pointer; font-size:1.6rem;font-weight:900;
+  background:var(--bg);box-shadow:var(--nm-btn);color:var(--primary);transition:all var(--transition);
+  display:flex;align-items:center;justify-content:center; }
+.count-btn:active { box-shadow:var(--nm-btn-active); }
+.history-row { display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:16px;align-items:center; }
+.chart-bar-wrap { height:160px;display:flex;align-items:flex-end;gap:8px;padding:8px 0; }
+.chart-bar-item { display:flex;flex-direction:column;align-items:center;gap:4px;flex:1; }
+.chart-bar { width:100%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--accent),var(--primary));transition:height 0.5s ease;min-height:4px; }
+.chart-bar-label { font-size:0.7rem;font-weight:800;color:var(--text-muted); }
+.chart-bar-val { font-size:0.75rem;font-weight:900;color:var(--primary); }
+.today-banner { background:linear-gradient(135deg,var(--primary),var(--primary-light)); border-radius:var(--radius-lg); padding:28px 32px; color:white; }
+.today-banner h3 { color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:800;letter-spacing:1px;text-transform:uppercase; }
+.today-banner .big-num { font-family:'Barlow Condensed',sans-serif;font-size:4rem;font-weight:900;line-height:1; }
+.today-banner .sub { color:rgba(255,255,255,0.7);font-size:0.9rem;font-weight:700; }
+</style>
+</head>
+<body>
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <p style="font-weight:800;color:var(--text-muted);">Loading dashboard...</p>
+</div>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-text">LOTUS</div>
+    <div class="logo-sub">Employee Portal</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-title">Navigation</span>
+    <button class="nav-link active" data-page="overview">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Overview
+    </button>
+    <button class="nav-link" data-page="submit">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Submit Reviews
+    </button>
+    <button class="nav-link" data-page="history">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      My Records
+    </button>
+    <button class="nav-link" data-page="stats">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      My Stats
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-avatar">U</div>
+      <div class="sidebar-user-info">
+        <div class="name" id="sb-name">Loading...</div>
+        <div class="role" id="sb-role">Employee</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm w-full mt-2" id="logout-btn" style="color:rgba(255,255,255,0.7);margin-top:10px;">
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- Main Layout -->
+<div class="main-layout">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      <div>
+        <div class="topbar-title" id="page-title">Overview</div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);" id="topbar-sub">Welcome back!</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge badge-accent" id="topbar-brand">—</span>
+      <span class="badge badge-primary" id="topbar-dealership">No Dealership</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <!-- ═══════════ OVERVIEW PAGE ═══════════ -->
+    <div id="page-overview">
+      <div class="grid grid-4 mb-3" id="overview-stats">
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(0,170,210,0.12);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-today">—</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(0,44,95,0.08);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-month">—</div>
+          <div class="stat-label">This Month</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(45,198,83,0.12);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--success)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <div class="stat-value" id="ov-year">—</div>
+          <div class="stat-label">This Year</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(244,162,97,0.15);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--warning)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-streak">—</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <!-- Today's Banner -->
+        <div class="today-banner nm-card" style="background:linear-gradient(135deg,var(--primary),var(--primary-light));">
+          <h3>TODAY'S REVIEWS</h3>
+          <div class="big-num" id="today-big">0</div>
+          <div class="sub" id="today-date-label">—</div>
+          <button class="btn btn-accent btn-sm mt-2" onclick="goToPage('submit')">+ Submit Reviews</button>
+        </div>
+
+        <!-- Weekly Chart -->
+        <div class="nm-card">
+          <h3 class="mb-2">Last 7 Days</h3>
+          <div class="chart-bar-wrap" id="weekly-chart">
+            <div class="empty-state"><p>Loading chart...</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Records -->
+      <div class="nm-card mt-3">
+        <div class="flex justify-between items-center mb-2">
+          <h3>Recent Submissions</h3>
+          <button class="btn btn-ghost btn-sm" onclick="goToPage('history')">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Reviews</th><th>Brand</th><th>Dealership</th><th>Actions</th></tr></thead>
+            <tbody id="recent-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ SUBMIT PAGE ═══════════ -->
+    <div id="page-submit" class="hidden">
+      <div class="review-form-section">
+        <div class="nm-card">
+          <h2 class="mb-1" style="color:var(--primary);">Submit Today's Reviews</h2>
+          <p class="text-muted mb-3">Enter the number of reviews you collected today</p>
+
+          <!-- Date selector -->
+          <div class="form-group mb-3">
+            <label>Date</label>
+            <input type="date" id="submit-date" class="form-control" style="max-width:240px;">
+          </div>
+
+          <div style="margin-bottom:32px;">
+            <label style="font-size:0.82rem;font-weight:800;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;display:block;margin-bottom:12px;">Number of Reviews</label>
+            <div class="count-ctrl">
+              <button class="count-btn" id="btn-minus">−</button>
+              <input type="number" id="review-count" class="review-count-input" value="0" min="0" max="9999">
+              <button class="count-btn" id="btn-plus">+</button>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label>Notes (optional)</label>
+            <textarea id="submit-notes" class="form-control" rows="3" placeholder="Any notes about today's collection..."></textarea>
+          </div>
+
+          <div id="submit-msg" class="alert hidden mb-2"></div>
+
+          <div style="display:flex;gap:12px;">
+            <button class="btn btn-accent" id="submit-btn" style="padding:14px 40px;font-size:1.1rem;">
+              Submit Reviews
+            </button>
+            <button class="btn btn-ghost" onclick="document.getElementById('review-count').value=0">Reset</button>
+          </div>
+        </div>
+
+        <!-- Today's summary -->
+        <div class="nm-card mt-3" id="submit-existing-card" style="display:none;">
+          <h3 class="mb-1">Already submitted today</h3>
+          <p class="text-muted" id="submit-existing-text">You have submitted reviews today. Submitting again will update the record.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ HISTORY PAGE ═══════════ -->
+    <div id="page-history" class="hidden">
+      <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:12px;">
+        <h2 style="color:var(--primary);">My Review Records</h2>
+        <div class="filter-row">
+          <input type="month" id="history-month-filter" class="form-control" style="width:auto;">
+          <button class="btn btn-primary btn-sm" id="history-filter-btn">Filter</button>
+          <button class="btn btn-ghost btn-sm" id="history-clear-btn">Clear</button>
+        </div>
+      </div>
+      <div class="nm-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Reviews Collected</th><th>Notes</th><th>Submitted At</th><th>Actions</th></tr></thead>
+            <tbody id="history-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">Loading records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ STATS PAGE ═══════════ -->
+    <div id="page-stats" class="hidden">
+      <h2 style="color:var(--primary);" class="mb-3">My Performance Stats</h2>
+      <div class="grid grid-3 mb-3">
+        <div class="nm-card">
+          <div class="text-muted" style="font-size:0.78rem;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">This Month</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;color:var(--primary);line-height:1;" id="stats-month">—</div>
+          <div class="text-muted" style="font-size:0.82rem;font-weight:700;margin-top:4px;" id="stats-month-label">—</div>
+        </div>
+        <div class="nm-card">
+          <div class="text-muted" style="font-size:0.78rem;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">This Year</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;color:var(--accent);line-height:1;" id="stats-year">—</div>
+          <div class="text-muted" style="font-size:0.82rem;font-weight:700;margin-top:4px;" id="stats-year-label">—</div>
+        </div>
+        <div class="nm-card">
+          <div class="text-muted" style="font-size:0.78rem;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">Daily Average</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;color:var(--success);line-height:1;" id="stats-avg">—</div>
+          <div class="text-muted" style="font-size:0.82rem;font-weight:700;margin-top:4px;">Reviews / Day</div>
+        </div>
+      </div>
+      <div class="nm-card">
+        <h3 class="mb-3">Monthly Breakdown</h3>
+        <div id="monthly-breakdown">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    Developed by <strong>Dharun Kumar N</strong> ( SEO &amp; ORM Analyst @ Lotus Hyundai HO )
+  </footer>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Review Record</span>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-record-id">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="edit-date" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label>Number of Reviews</label>
+        <input type="number" id="edit-count" class="form-control" min="0" max="9999">
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="edit-notes" class="form-control" rows="3"></textarea>
+      </div>
+      <div id="edit-msg" class="alert hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="btn btn-primary" id="edit-save-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  collection, doc, getDoc, getDocs, setDoc, updateDoc,
+  query, where, orderBy, serverTimestamp, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { showToast, openModal, closeModal, initSidebar, getInitials, formatDate, todayStr, monthStr, yearStr, getMonthName, numFmt } from './js/utils.js';
+
+window.closeModal = closeModal;
+
+let currentUser = null;
+let allRecords = [];
+
+// ── Auth Guard ──
+onAuthStateChanged(auth, async (firebaseUser) => {
+  if (!firebaseUser) { window.location.href = 'employee-login.html'; return; }
+  const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
+  if (!snap.exists()) { await signOut(auth); window.location.href = 'employee-login.html'; return; }
+  const userData = snap.data();
+  if (userData.role !== 'employee') { await signOut(auth); window.location.href = 'employee-login.html'; return; }
+  currentUser = { uid: firebaseUser.uid, ...userData };
+  initUI();
+  document.getElementById('loading-overlay').style.display = 'none';
+});
+
+function initUI() {
+  // Sidebar info
+  document.getElementById('sb-avatar').textContent = getInitials(currentUser.name);
+  document.getElementById('sb-name').textContent = currentUser.name;
+  document.getElementById('sb-role').textContent = currentUser.brand || 'Employee';
+  document.getElementById('topbar-brand').textContent = currentUser.brand || '—';
+  document.getElementById('topbar-dealership').textContent = currentUser.dealershipName || 'No Dealership';
+  document.getElementById('topbar-sub').textContent = `Welcome, ${currentUser.name}!`;
+
+  initSidebar();
+
+  // Date fields
+  document.getElementById('submit-date').value = todayStr();
+  document.getElementById('history-month-filter').value = monthStr();
+
+  // Nav
+  document.querySelectorAll('.nav-link[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => goToPage(btn.dataset.page));
+  });
+
+  // Counter buttons
+  document.getElementById('btn-plus').addEventListener('click', () => {
+    const el = document.getElementById('review-count');
+    el.value = parseInt(el.value||0) + 1;
+  });
+  document.getElementById('btn-minus').addEventListener('click', () => {
+    const el = document.getElementById('review-count');
+    el.value = Math.max(0, parseInt(el.value||0) - 1);
+  });
+
+  // Submit
+  document.getElementById('submit-btn').addEventListener('click', submitReviews);
+
+  // History filter
+  document.getElementById('history-filter-btn').addEventListener('click', loadHistory);
+  document.getElementById('history-clear-btn').addEventListener('click', () => {
+    document.getElementById('history-month-filter').value = '';
+    loadHistory();
+  });
+
+  // Edit save
+  document.getElementById('edit-save-btn').addEventListener('click', saveEdit);
+
+  // Logout
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await signOut(auth);
+    sessionStorage.removeItem('lotus_user');
+    window.location.href = 'employee-login.html';
+  });
+
+  // Check today's submission when opening submit page
+  document.getElementById('submit-date').addEventListener('change', checkTodaySubmission);
+
+  loadOverview();
+}
+
+window.goToPage = function(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('hidden'));
+  document.getElementById('page-' + page)?.classList.remove('hidden');
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.nav-link[data-page="${page}"]`)?.classList.add('active');
+  const titles = { overview:'Overview', submit:'Submit Reviews', history:'My Records', stats:'My Stats' };
+  document.getElementById('page-title').textContent = titles[page] || page;
+  if (page === 'history') loadHistory();
+  if (page === 'stats') loadStats();
+  if (page === 'submit') checkTodaySubmission();
+  if (page === 'overview') loadOverview();
+};
+
+// ── Overview ──
+async function loadOverview() {
+  try {
+    const today = todayStr();
+    const month = monthStr();
+    const year = yearStr();
+
+    const q = query(collection(db, 'reviews'), where('employeeId','==',currentUser.uid), orderBy('date','desc'));
+    const snap = await getDocs(q);
+    allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    const todayRec = allRecords.find(r => r.date === today);
+    const todayCount = todayRec ? (todayRec.count || 0) : 0;
+    const monthCount = allRecords.filter(r => r.date?.startsWith(month)).reduce((s,r) => s + (r.count||0), 0);
+    const yearCount = allRecords.filter(r => r.date?.startsWith(year)).reduce((s,r) => s + (r.count||0), 0);
+
+    // Streak
+    let streak = 0;
+    const sortedDates = [...new Set(allRecords.map(r=>r.date))].sort().reverse();
+    let checkDate = new Date(); checkDate.setHours(0,0,0,0);
+    for (const d of sortedDates) {
+      const ds = `${checkDate.getFullYear()}-${String(checkDate.getMonth()+1).padStart(2,'0')}-${String(checkDate.getDate()).padStart(2,'0')}`;
+      if (d === ds) { streak++; checkDate.setDate(checkDate.getDate()-1); }
+      else if (d < ds) break;
+    }
+
+    document.getElementById('ov-today').textContent = numFmt(todayCount);
+    document.getElementById('ov-month').textContent = numFmt(monthCount);
+    document.getElementById('ov-year').textContent = numFmt(yearCount);
+    document.getElementById('ov-streak').textContent = streak;
+    document.getElementById('today-big').textContent = numFmt(todayCount);
+    document.getElementById('today-date-label').textContent = formatDate(new Date());
+
+    renderWeeklyChart();
+    renderRecentTable(allRecords.slice(0, 5));
+  } catch(e) { console.error(e); }
+}
+
+function renderWeeklyChart() {
+  const chartEl = document.getElementById('weekly-chart');
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const rec = allRecords.find(r => r.date === ds);
+    days.push({ label: d.toLocaleDateString('en-IN',{weekday:'short'}), val: rec ? (rec.count||0) : 0 });
+  }
+  const maxVal = Math.max(...days.map(d=>d.val), 1);
+  chartEl.innerHTML = days.map(d => `
+    <div class="chart-bar-item">
+      <div class="chart-bar-val">${d.val > 0 ? d.val : ''}</div>
+      <div class="chart-bar" style="height:${Math.max((d.val/maxVal)*120,4)}px;"></div>
+      <div class="chart-bar-label">${d.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderRecentTable(records) {
+  const tbody = document.getElementById('recent-tbody');
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No records yet. Start submitting!</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = records.map(r => `
+    <tr>
+      <td><strong>${formatDate(new Date(r.date + 'T00:00:00'))}</strong></td>
+      <td><span class="badge badge-accent" style="font-size:1rem;">${numFmt(r.count || 0)}</span></td>
+      <td>${r.brandName || currentUser.brand || '—'}</td>
+      <td>${r.dealershipName || currentUser.dealershipName || '—'}</td>
+      <td class="actions">
+        <button class="btn btn-sm btn-primary" onclick="openEditModal('${r.id}','${r.date}',${r.count||0},'${(r.notes||'').replace(/'/g,"\\'")}')">Edit</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── Submit Reviews ──
+async function checkTodaySubmission() {
+  const date = document.getElementById('submit-date').value;
+  if (!date) return;
+  const rec = allRecords.find(r => r.date === date);
+  const card = document.getElementById('submit-existing-card');
+  if (rec) {
+    document.getElementById('review-count').value = rec.count || 0;
+    document.getElementById('submit-notes').value = rec.notes || '';
+    document.getElementById('submit-existing-text').textContent = `You already submitted ${rec.count} reviews for ${formatDate(new Date(date+'T00:00:00'))}. Submitting again will update the record.`;
+    card.style.display = 'block';
+  } else {
+    card.style.display = 'none';
+    document.getElementById('review-count').value = 0;
+    document.getElementById('submit-notes').value = '';
+  }
+}
+
+async function submitReviews() {
+  const date = document.getElementById('submit-date').value;
+  const count = parseInt(document.getElementById('review-count').value) || 0;
+  const notes = document.getElementById('submit-notes').value.trim();
+  const msgEl = document.getElementById('submit-msg');
+  msgEl.classList.add('hidden');
+
+  if (!date) { msgEl.textContent = 'Please select a date.'; msgEl.className = 'alert alert-danger'; msgEl.classList.remove('hidden'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+
+  try {
+    const docId = `${currentUser.uid}_${date}`;
+    await setDoc(doc(db, 'reviews', docId), {
+      employeeId: currentUser.uid,
+      employeeName: currentUser.name,
+      employeeEmail: currentUser.email,
+      dealership: currentUser.dealership || null,
+      dealershipName: currentUser.dealershipName || null,
+      brand: currentUser.brand || null,
+      brandName: currentUser.brand || null,
+      date, count, notes,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    msgEl.textContent = `✅ Successfully submitted ${count} reviews for ${formatDate(new Date(date+'T00:00:00'))}!`;
+    msgEl.className = 'alert alert-success'; msgEl.classList.remove('hidden');
+    showToast('Reviews submitted!', 'success');
+    loadOverview();
+    setTimeout(() => { msgEl.classList.add('hidden'); }, 4000);
+  } catch(e) {
+    msgEl.textContent = 'Error: ' + e.message; msgEl.className = 'alert alert-danger'; msgEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Submit Reviews'; btn.disabled = false;
+}
+
+// ── History ──
+async function loadHistory() {
+  const monthFilter = document.getElementById('history-month-filter').value;
+  const tbody = document.getElementById('history-tbody');
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;"><div class="spinner" style="width:24px;height:24px;margin:0 auto;"></div></td></tr>`;
+
+  try {
+    let records = allRecords;
+    if (monthFilter) records = records.filter(r => r.date?.startsWith(monthFilter));
+    records = [...records].sort((a,b) => b.date?.localeCompare(a.date));
+
+    if (!records.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No records found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = records.map(r => `
+      <tr>
+        <td><strong>${formatDate(new Date(r.date+'T00:00:00'))}</strong></td>
+        <td><span class="badge badge-accent" style="font-size:0.95rem;">${numFmt(r.count||0)}</span></td>
+        <td>${r.notes || '<span style="color:var(--text-muted)">—</span>'}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted);">${r.updatedAt?.toDate ? formatDate(r.updatedAt.toDate()) : '—'}</td>
+        <td class="actions">
+          <button class="btn btn-sm btn-primary" onclick="openEditModal('${r.id}','${r.date}',${r.count||0},'${(r.notes||'').replace(/'/g,"\\'")}')">Edit</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:var(--danger);">${e.message}</td></tr>`; }
+}
+
+// ── Edit ──
+window.openEditModal = function(id, date, count, notes) {
+  document.getElementById('edit-record-id').value = id;
+  document.getElementById('edit-date').value = date;
+  document.getElementById('edit-count').value = count;
+  document.getElementById('edit-notes').value = notes || '';
+  document.getElementById('edit-msg').classList.add('hidden');
+  openModal('edit-modal');
+};
+
+async function saveEdit() {
+  const id = document.getElementById('edit-record-id').value;
+  const count = parseInt(document.getElementById('edit-count').value) || 0;
+  const notes = document.getElementById('edit-notes').value.trim();
+  const msgEl = document.getElementById('edit-msg');
+  const btn = document.getElementById('edit-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    await updateDoc(doc(db, 'reviews', id), { count, notes, updatedAt: serverTimestamp() });
+    showToast('Record updated!', 'success');
+    closeModal('edit-modal');
+    // Refresh
+    const q = query(collection(db, 'reviews'), where('employeeId','==',currentUser.uid), orderBy('date','desc'));
+    const snap = await getDocs(q);
+    allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    loadHistory();
+    loadOverview();
+  } catch(e) {
+    msgEl.textContent = 'Error: ' + e.message; msgEl.className='alert alert-danger'; msgEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Save Changes'; btn.disabled = false;
+}
+
+// ── Stats ──
+async function loadStats() {
+  const month = monthStr();
+  const year = yearStr();
+  const monthRecords = allRecords.filter(r => r.date?.startsWith(month));
+  const yearRecords = allRecords.filter(r => r.date?.startsWith(year));
+  const monthTotal = monthRecords.reduce((s,r) => s+(r.count||0), 0);
+  const yearTotal = yearRecords.reduce((s,r) => s+(r.count||0), 0);
+  const activeDays = yearRecords.length;
+  const avg = activeDays > 0 ? Math.round(yearTotal / activeDays) : 0;
+
+  document.getElementById('stats-month').textContent = numFmt(monthTotal);
+  document.getElementById('stats-month-label').textContent = getMonthName(month);
+  document.getElementById('stats-year').textContent = numFmt(yearTotal);
+  document.getElementById('stats-year-label').textContent = year;
+  document.getElementById('stats-avg').textContent = numFmt(avg);
+
+  // Monthly breakdown
+  const breakdown = document.getElementById('monthly-breakdown');
+  const monthsMap = {};
+  allRecords.forEach(r => {
+    const m = r.date?.slice(0,7);
+    if (m) monthsMap[m] = (monthsMap[m]||0) + (r.count||0);
+  });
+  const months = Object.entries(monthsMap).sort((a,b) => b[0].localeCompare(a[0])).slice(0, 12);
+  const maxM = Math.max(...months.map(m=>m[1]), 1);
+  if (!months.length) { breakdown.innerHTML = `<div class="empty-state"><h4>No data yet</h4></div>`; return; }
+  breakdown.innerHTML = months.map(([m, v]) => `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-weight:800;font-size:0.9rem;">${getMonthName(m)}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:900;color:var(--primary);">${numFmt(v)}</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${Math.round((v/maxM)*100)}%"></div></div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
