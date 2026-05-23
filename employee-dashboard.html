@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Dashboard — Lotus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   LOTUS DASHBOARD — Employee Dashboard (Standalone)
+   Bauhaus + Neomorphism | Hyundai Brand Colors | Bold Font
+   ============================================================ */
+:root {
+  --primary:       #002C5F;
+  --primary-light: #003f85;
+  --accent:        #00AAD2;
+  --accent-dark:   #0088aa;
+  --white:         #FFFFFF;
+  --bg:            #e8eaf0;
+  --bg-card:       #e8eaf0;
+  --text:          #1a1a2e;
+  --text-muted:    #5a6475;
+  --danger:        #e63946;
+  --success:       #2dc653;
+  --warning:       #f4a261;
+  --border:        #d0d4de;
+  --nm-out:        6px 6px 14px #c5c8d4, -6px -6px 14px #ffffff;
+  --nm-in:         inset 4px 4px 10px #c5c8d4, inset -4px -4px 10px #ffffff;
+  --nm-out-lg:     10px 10px 22px #c0c3cf, -10px -10px 22px #ffffff;
+  --nm-btn:        4px 4px 10px #c0c3cf, -2px -2px 8px #ffffff;
+  --nm-btn-active: inset 3px 3px 8px #c0c3cf, inset -2px -2px 6px #ffffff;
+  --radius:    16px;
+  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --transition: 0.22s cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Barlow', sans-serif; font-weight: 700; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+h1,h2,h3,h4 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; letter-spacing: -0.5px; }
+h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+h3 { font-size: 1.3rem; }
+p { font-weight: 600; }
+a { color: inherit; text-decoration: none; }
+
+/* Utilities */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.grid { display: grid; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.w-full { width: 100%; }
+.mt-1 { margin-top: 8px; } .mt-2 { margin-top: 16px; } .mt-3 { margin-top: 24px; }
+.mb-1 { margin-bottom: 8px; } .mb-2 { margin-bottom: 16px; } .mb-3 { margin-bottom: 24px; }
+.text-muted { color: var(--text-muted); font-weight: 600; }
+.text-center { text-align: center; }
+
+/* Neomorphic Cards */
+.nm-card { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--nm-out); padding: 28px; transition: box-shadow var(--transition); }
+.nm-card:hover { box-shadow: var(--nm-out-lg); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 28px; border-radius: var(--radius-sm); border: none; cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 800; letter-spacing: 0.5px;
+  transition: all var(--transition); box-shadow: var(--nm-btn); background: var(--bg); color: var(--text);
+}
+.btn:active { box-shadow: var(--nm-btn-active); transform: scale(0.98); }
+.btn-primary { background: var(--primary); color: var(--white); box-shadow: 4px 4px 12px rgba(0,44,95,0.35),-2px -2px 8px rgba(255,255,255,0.7); }
+.btn-primary:hover { background: var(--primary-light); }
+.btn-accent  { background: var(--accent);  color: var(--white); box-shadow: 4px 4px 12px rgba(0,170,210,0.35),-2px -2px 8px rgba(255,255,255,0.7); }
+.btn-accent:hover  { background: var(--accent-dark); }
+.btn-ghost  { background: transparent; box-shadow: none; }
+.btn-ghost:hover  { background: rgba(0,44,95,0.08); }
+.btn-sm  { padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; }
+.btn-wide { width: 100%; padding: 14px; font-size: 1.1rem; }
+
+/* Forms */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 0.82rem; font-weight: 800; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; }
+.form-control {
+  padding: 13px 16px; border-radius: var(--radius-sm); border: none;
+  background: var(--bg); box-shadow: var(--nm-in);
+  font-family: 'Barlow', sans-serif; font-size: 0.97rem; font-weight: 700;
+  color: var(--text); outline: none; transition: box-shadow var(--transition); width: 100%;
+}
+.form-control:focus { box-shadow: inset 3px 3px 8px #b8bbc7, inset -3px -3px 8px #fff, 0 0 0 2px var(--accent); }
+.form-control::placeholder { color: var(--text-muted); font-weight: 600; }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px; }
+.badge-primary { background: rgba(0,44,95,0.12); color: var(--primary); }
+.badge-accent  { background: rgba(0,170,210,0.15); color: var(--accent-dark); }
+
+/* Alert */
+.alert { padding: 14px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 10px; }
+.alert-success { background: rgba(45,198,83,0.12); color: #1a8c3a; border-left: 4px solid var(--success); }
+.alert-danger  { background: rgba(230,57,70,0.1);  color: var(--danger); border-left: 4px solid var(--danger); }
+
+/* Progress Bar */
+.progress-wrap { background: var(--bg); border-radius: 20px; box-shadow: var(--nm-in); height: 14px; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--accent), var(--primary)); transition: width 0.8s cubic-bezier(.4,0,.2,1); position: relative; }
+.progress-bar::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.3) 0%,transparent 60%); border-radius:20px; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--nm-out-lg); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.25s; }
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-header { padding: 24px 28px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.5rem; font-weight: 900; color: var(--primary); }
+.modal-close { background: none; border: none; cursor: pointer; padding: 6px; color: var(--text-muted); font-size: 1.2rem; border-radius: 8px; transition: background var(--transition); }
+.modal-close:hover { background: rgba(0,44,95,0.08); }
+.modal-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+.modal-footer { padding: 16px 28px 24px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid var(--border); }
+
+/* Toasts */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: var(--bg); border-radius: 12px; box-shadow: var(--nm-out); padding: 14px 20px; display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.9rem; min-width: 280px; animation: slideIn 0.3s ease; border-left: 4px solid var(--accent); }
+.toast.success { border-color: var(--success); }
+.toast.error   { border-color: var(--danger);  }
+.toast.warning { border-color: var(--warning); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+.toast.out { animation: slideOut 0.3s ease forwards; }
+
+/* Sidebar */
+.sidebar { width: 250px; min-height: 100vh; background: var(--primary); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100; box-shadow: 6px 0 20px rgba(0,44,95,0.3); transition: transform 0.3s; }
+.sidebar-brand { padding: 28px 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+.sidebar-brand .logo-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.8rem; color: var(--white); }
+.sidebar-brand .logo-sub  { font-size: 0.75rem; color: var(--accent); font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+.nav-section-title { font-size: 0.68rem; font-weight: 800; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 12px 6px; }
+.nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; color: rgba(255,255,255,0.75); font-weight: 800; font-size: 0.92rem; cursor: pointer; transition: all var(--transition); border: none; background: transparent; width: 100%; text-align: left; }
+.nav-link svg { flex-shrink: 0; }
+.nav-link:hover  { background: rgba(255,255,255,0.12); color: var(--white); }
+.nav-link.active { background: var(--accent); color: var(--white); box-shadow: 0 4px 12px rgba(0,170,210,0.4); }
+.sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.12); }
+.sidebar-user { display: flex; align-items: center; gap: 12px; }
+.sidebar-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; color: var(--white); flex-shrink: 0; }
+.sidebar-user-info .name { font-size: 0.88rem; font-weight: 800; color: var(--white); }
+.sidebar-user-info .role { font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Main Layout */
+.main-layout { margin-left: 250px; min-height: 100vh; }
+.topbar { background: var(--bg); box-shadow: 0 2px 12px rgba(0,44,95,0.08); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.topbar-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--primary); }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.page-content { padding: 32px; }
+
+/* Stat Cards */
+.stat-card { text-align: center; }
+.stat-card .stat-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; box-shadow: var(--nm-btn); }
+.stat-card .stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 2.4rem; font-weight: 900; color: var(--primary); line-height: 1; }
+.stat-card .stat-label { font-size: 0.8rem; font-weight: 800; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 4px; }
+
+/* Table */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-sm); box-shadow: var(--nm-in); background: var(--bg); }
+table { width: 100%; border-collapse: collapse; }
+thead th { background: var(--primary); color: var(--white); padding: 14px 16px; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; }
+thead th:first-child { border-radius: 10px 0 0 0; }
+thead th:last-child  { border-radius: 0 10px 0 0; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background var(--transition); }
+tbody tr:last-child  { border-bottom: none; }
+tbody tr:hover { background: rgba(0,170,210,0.05); }
+tbody td { padding: 13px 16px; font-weight: 700; font-size: 0.92rem; }
+tbody td.actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Filter Row */
+.filter-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.filter-row .form-control { width: auto; min-width: 160px; }
+
+/* Loading / Spinner */
+.spinner { width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 40px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9998; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+.loading-overlay .spinner { width: 50px; height: 50px; border-width: 5px; }
+
+/* Footer */
+.page-footer { padding: 24px 32px; text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); border-top: 1px solid var(--border); background: var(--bg); }
+
+/* Hamburger + Overlay */
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; }
+.hamburger span { display: block; width: 22px; height: 3px; background: var(--primary); border-radius: 2px; margin: 4px 0; transition: var(--transition); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; }
+
+/* Today Banner */
+.today-banner { background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: var(--radius-lg); padding: 28px 32px; color: white; }
+.today-banner h3 { color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+.today-banner .big-num { font-family: 'Barlow Condensed', sans-serif; font-size: 4rem; font-weight: 900; line-height: 1; }
+.today-banner .sub { color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 700; }
+
+/* Review Submit */
+.review-form-section { max-width: 680px; }
+.count-ctrl { display: flex; align-items: center; gap: 20px; }
+.count-btn { width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.6rem; font-weight: 900; background: var(--bg); box-shadow: var(--nm-btn); color: var(--primary); transition: all var(--transition); display: flex; align-items: center; justify-content: center; }
+.count-btn:active { box-shadow: var(--nm-btn-active); }
+.review-count-input { font-family: 'Barlow Condensed', sans-serif; font-size: 3rem; font-weight: 900; text-align: center; width: 140px; border: none; background: var(--bg); box-shadow: var(--nm-in); border-radius: 16px; padding: 16px; color: var(--primary); outline: none; }
+.review-count-input:focus { box-shadow: inset 3px 3px 8px #b8bbc7, inset -3px -3px 8px #fff, 0 0 0 2px var(--accent); }
+
+/* Weekly Chart */
+.chart-bar-wrap { height: 160px; display: flex; align-items: flex-end; gap: 8px; padding: 8px 0; }
+.chart-bar-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.chart-bar { width: 100%; border-radius: 8px 8px 0 0; background: linear-gradient(180deg, var(--accent), var(--primary)); transition: height 0.5s ease; min-height: 4px; }
+.chart-bar-label { font-size: 0.7rem;  font-weight: 800; color: var(--text-muted); }
+.chart-bar-val   { font-size: 0.75rem; font-weight: 900; color: var(--primary); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px 20px; }
+.empty-state h4 { color: var(--text-muted); font-size: 1.1rem; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.visible { display: block; }
+  .main-layout { margin-left: 0; }
+  .topbar { padding: 16px 20px; }
+  .page-content { padding: 20px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .hamburger { display: flex; flex-direction: column; }
+}
+@media (max-width: 600px) {
+  .review-count-input { font-size: 2rem; width: 100px; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <p style="font-weight:800;color:var(--text-muted);">Loading dashboard...</p>
+</div>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-text">LOTUS</div>
+    <div class="logo-sub">Employee Portal</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-title">Navigation</span>
+    <button class="nav-link active" data-page="overview">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Overview
+    </button>
+    <button class="nav-link" data-page="submit">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Submit Reviews
+    </button>
+    <button class="nav-link" data-page="history">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      My Records
+    </button>
+    <button class="nav-link" data-page="stats">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      My Stats
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-avatar">U</div>
+      <div class="sidebar-user-info">
+        <div class="name" id="sb-name">Loading...</div>
+        <div class="role" id="sb-role">Employee</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm w-full" id="logout-btn" style="color:rgba(255,255,255,0.7);margin-top:10px;">Sign Out</button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN LAYOUT ═══ -->
+<div class="main-layout">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      <div>
+        <div class="topbar-title" id="page-title">Overview</div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);" id="topbar-sub">Welcome back!</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge badge-accent" id="topbar-brand">—</span>
+      <span class="badge badge-primary" id="topbar-dealership">No Dealership</span>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- ════════ OVERVIEW ════════ -->
+    <div id="page-overview">
+      <div class="grid grid-4 mb-3">
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(0,170,210,0.12);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-today">—</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(0,44,95,0.08);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-month">—</div>
+          <div class="stat-label">This Month</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(45,198,83,0.12);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--success)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <div class="stat-value" id="ov-year">—</div>
+          <div class="stat-label">This Year</div>
+        </div>
+        <div class="nm-card stat-card">
+          <div class="stat-icon" style="background:rgba(244,162,97,0.15);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--warning)" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+          </div>
+          <div class="stat-value" id="ov-streak">—</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="today-banner nm-card">
+          <h3>TODAY'S REVIEWS</h3>
+          <div class="big-num" id="today-big">0</div>
+          <div class="sub" id="today-date-label">—</div>
+          <button class="btn btn-accent btn-sm mt-2" onclick="goToPage('submit')">+ Submit Reviews</button>
+        </div>
+        <div class="nm-card">
+          <h3 class="mb-2">Last 7 Days</h3>
+          <div class="chart-bar-wrap" id="weekly-chart">
+            <div class="empty-state"><p>Loading chart...</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nm-card mt-3">
+        <div class="flex justify-between items-center mb-2">
+          <h3>Recent Submissions</h3>
+          <button class="btn btn-ghost btn-sm" onclick="goToPage('history')">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Reviews</th><th>Brand</th><th>Dealership</th><th>Actions</th></tr></thead>
+            <tbody id="recent-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ SUBMIT ════════ -->
+    <div id="page-submit" class="hidden">
+      <div class="review-form-section">
+        <div class="nm-card">
+          <h2 class="mb-1" style="color:var(--primary);">Submit Today's Reviews</h2>
+          <p class="text-muted mb-3">Enter the number of reviews you collected today</p>
+          <div class="form-group mb-3">
+            <label>Date</label>
+            <input type="date" id="submit-date" class="form-control" style="max-width:240px;">
+          </div>
+          <div style="margin-bottom:32px;">
+            <label style="font-size:0.82rem;font-weight:800;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;display:block;margin-bottom:12px;">Number of Reviews</label>
+            <div class="count-ctrl">
+              <button class="count-btn" id="btn-minus">−</button>
+              <input type="number" id="review-count" class="review-count-input" value="0" min="0" max="9999">
+              <button class="count-btn" id="btn-plus">+</button>
+            </div>
+          </div>
+          <div class="form-group mb-3">
+            <label>Notes (optional)</label>
+            <textarea id="submit-notes" class="form-control" rows="3" placeholder="Any notes about today's collection..."></textarea>
+          </div>
+          <div id="submit-msg" class="alert hidden mb-2"></div>
+          <div style="display:flex;gap:12px;">
+            <button class="btn btn-accent" id="submit-btn" style="padding:14px 40px;font-size:1.1rem;">Submit Reviews</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('review-count').value=0">Reset</button>
+          </div>
+        </div>
+        <div class="nm-card mt-3 hidden" id="submit-existing-card">
+          <h3 class="mb-1">Already submitted for this date</h3>
+          <p class="text-muted" id="submit-existing-text">Submitting again will update the record.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ HISTORY ════════ -->
+    <div id="page-history" class="hidden">
+      <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:12px;">
+        <h2 style="color:var(--primary);">My Review Records</h2>
+        <div class="filter-row">
+          <input type="month" id="history-month-filter" class="form-control" style="width:auto;">
+          <button class="btn btn-primary btn-sm" id="history-filter-btn">Filter</button>
+          <button class="btn btn-ghost btn-sm"  id="history-clear-btn">Clear</button>
+        </div>
+      </div>
+      <div class="nm-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Reviews Collected</th><th>Notes</th><th>Last Updated</th><th>Actions</th></tr></thead>
+            <tbody id="history-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">Loading records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ STATS ════════ -->
+    <div id="page-stats" class="hidden">
+      <h2 style="color:var(--primary);" class="mb-3">My Performance Stats</h2>
+      <div class="grid grid-3 mb-3">
+        <div class="nm-card">
+          <div class="text-muted" style="font-size:0.78rem;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">This Month</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;color:var(--primary);line-height:1;" id="stats-month">—</div>
+          <div class="text-muted" style="font-size:0.82rem;font-weight:700;margin-top:4px;" id="stats-month-label">—</div>
+        </div>
+        <div class="nm-card">
+          <div class="text-muted" style="font-size:0.78rem;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">This Year</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;color:var(--accent);line-height:1;" id="stats-year">—</div>
+          <div class="text-muted" style="font-size:0.82rem;font-weight:700;margin-top:4px;" id="stats-year-label">—</div>
+        </div>
+        <div class="nm-card">
+          <div class="text-muted" style="font-size:0.78rem;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">Daily Average</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;color:var(--success);line-height:1;" id="stats-avg">—</div>
+          <div class="text-muted" style="font-size:0.82rem;font-weight:700;margin-top:4px;">Reviews / Day</div>
+        </div>
+      </div>
+      <div class="nm-card">
+        <h3 class="mb-3">Monthly Breakdown</h3>
+        <div id="monthly-breakdown"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div>
+  <footer class="page-footer">
+    Developed by <strong>Dharun Kumar N</strong> ( SEO &amp; ORM Analyst @ Lotus Hyundai HO )
+  </footer>
+</div>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Review Record</span>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-record-id">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="edit-date" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label>Number of Reviews</label>
+        <input type="number" id="edit-count" class="form-control" min="0" max="9999">
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="edit-notes" class="form-control" rows="3"></textarea>
+      </div>
+      <div id="edit-msg" class="alert hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modal-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" id="edit-save-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPT — Everything inlined, no external JS files
+     ═══════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut }   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, doc,
+  getDoc, getDocs, setDoc, updateDoc,
+  query, where, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ══════════════════════════════
+   ⚠️  PASTE YOUR FIREBASE CONFIG HERE
+   Firebase Console → Project Settings → Your Apps → SDK snippet
+   ══════════════════════════════ */
+const firebaseConfig = {
+    apiKey: "AIzaSyAEiHHK_RcN4aqgjIhBDqcNEXzdnnYaINw",
+    authDomain: "lets-collect-reviews.firebaseapp.com",
+    projectId: "lets-collect-reviews",
+    storageBucket: "lets-collect-reviews.firebasestorage.app",
+    messagingSenderId: "685155637353",
+    appId: "1:685155637353:web:f080dca7e7541ae46c2af8",
+    measurementId: "G-BBEKKQRXM5"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+/* ══════════════════════════════
+   UTILITY HELPERS (inlined)
+   ══════════════════════════════ */
+function showToast(message, type = 'info', duration = 3500) {
+  const container = document.getElementById('toast-container');
+  const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 350); }, duration);
+}
+
+function openModal()  { const el = document.getElementById('edit-modal'); if(el){ el.classList.add('open');    document.body.style.overflow='hidden'; } }
+function closeModal() { const el = document.getElementById('edit-modal'); if(el){ el.classList.remove('open'); document.body.style.overflow=''; } }
+
+function formatDate(date) { return date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }); }
+function todayStr()  { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function monthStr()  { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function yearStr()   { return `${new Date().getFullYear()}`; }
+function getMonthName(s) { const [y,m]=s.split('-'); return new Date(y,m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'}); }
+function getInitials(name) { return (name||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function numFmt(n)   { return Number(n||0).toLocaleString('en-IN'); }
+
+function initSidebar() {
+  const hamburger = document.getElementById('hamburger');
+  const sidebar   = document.getElementById('sidebar');
+  const overlay   = document.getElementById('sidebar-overlay');
+  hamburger?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('visible'); });
+  overlay?.addEventListener('click',   () => { sidebar.classList.remove('open'); overlay.classList.remove('visible'); });
+}
+
+/* ══════════════════════════════
+   STATE
+   ══════════════════════════════ */
+let currentUser = null;
+let allRecords  = [];
+
+/* ══════════════════════════════
+   AUTH GUARD
+   ══════════════════════════════ */
+onAuthStateChanged(auth, async (firebaseUser) => {
+  if (!firebaseUser) { window.location.href = 'employee-login.html'; return; }
+  const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
+  if (!snap.exists()) { await signOut(auth); window.location.href = 'employee-login.html'; return; }
+  const userData = snap.data();
+  if (userData.role !== 'employee') { await signOut(auth); window.location.href = 'employee-login.html'; return; }
+  currentUser = { uid: firebaseUser.uid, ...userData };
+  await initUI();                                             // FIX: await so data loads before overlay hides
+  document.getElementById('loading-overlay').style.display = 'none';
+});
+
+/* ══════════════════════════════
+   CORE DATA FETCHER  ← single source of truth
+   Every page calls this — no stale in-memory reads
+   ══════════════════════════════ */
+async function fetchUserRecords() {
+  // No orderBy — avoids composite index requirement; sort in JS instead
+  const q    = query(collection(db,'reviews'), where('employeeId','==',currentUser.uid));
+  const snap = await getDocs(q);
+  allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return allRecords;
+}
+
+/* ══════════════════════════════
+   INIT UI
+   ══════════════════════════════ */
+async function initUI() {
+  document.getElementById('sb-avatar').textContent        = getInitials(currentUser.name);
+  document.getElementById('sb-name').textContent          = currentUser.name;
+  document.getElementById('sb-role').textContent          = currentUser.brand || 'Employee';
+  document.getElementById('topbar-brand').textContent     = currentUser.brand || '—';
+  document.getElementById('topbar-dealership').textContent= currentUser.dealershipName || 'No Dealership';
+  document.getElementById('topbar-sub').textContent       = `Welcome, ${currentUser.name}!`;
+  document.getElementById('submit-date').value            = todayStr();
+  document.getElementById('history-month-filter').value   = monthStr();
+
+  initSidebar();
+
+  document.querySelectorAll('.nav-link[data-page]').forEach(btn =>
+    btn.addEventListener('click', () => goToPage(btn.dataset.page))
+  );
+
+  document.getElementById('btn-plus').addEventListener('click', () => {
+    const el = document.getElementById('review-count');
+    el.value = parseInt(el.value||0) + 1;
+  });
+  document.getElementById('btn-minus').addEventListener('click', () => {
+    const el = document.getElementById('review-count');
+    el.value = Math.max(0, parseInt(el.value||0) - 1);
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', submitReviews);
+  document.getElementById('submit-date').addEventListener('change', checkExistingSubmission);
+
+  document.getElementById('history-filter-btn').addEventListener('click', loadHistory);
+  document.getElementById('history-clear-btn').addEventListener('click', () => {
+    document.getElementById('history-month-filter').value = '';
+    loadHistory();
+  });
+
+  document.getElementById('edit-save-btn').addEventListener('click', saveEdit);
+  document.getElementById('modal-close-btn').addEventListener('click',  closeModal);
+  document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = 'employee-login.html';
+  });
+
+  await loadOverview();   // FIX: awaited — data ready before any interaction
+}
+
+/* ══════════════════════════════
+   NAVIGATION
+   ══════════════════════════════ */
+window.goToPage = function(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('hidden'));
+  document.getElementById('page-' + page)?.classList.remove('hidden');
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.nav-link[data-page="${page}"]`)?.classList.add('active');
+  const titles = { overview:'Overview', submit:'Submit Reviews', history:'My Records', stats:'My Stats' };
+  document.getElementById('page-title').textContent = titles[page] || page;
+  if (page === 'overview') loadOverview();
+  if (page === 'submit')   checkExistingSubmission();
+  if (page === 'history')  loadHistory();
+  if (page === 'stats')    loadStats();
+};
+
+/* ══════════════════════════════
+   OVERVIEW
+   ══════════════════════════════ */
+async function loadOverview() {
+  try {
+    await fetchUserRecords();   // FIX: always fresh from Firestore
+    const today = todayStr(), month = monthStr(), year = yearStr();
+
+    const todayCount = allRecords.filter(r => r.date === today).reduce((s,r) => s+(r.count||0), 0);
+    const monthCount = allRecords.filter(r => r.date?.startsWith(month)).reduce((s,r) => s+(r.count||0), 0);
+    const yearCount  = allRecords.filter(r => r.date?.startsWith(year)).reduce((s,r)  => s+(r.count||0), 0);
+
+    // Streak calc
+    let streak = 0;
+    const dates = [...new Set(allRecords.map(r=>r.date))].sort().reverse();
+    let check = new Date(); check.setHours(0,0,0,0);
+    for (const d of dates) {
+      const ds = `${check.getFullYear()}-${String(check.getMonth()+1).padStart(2,'0')}-${String(check.getDate()).padStart(2,'0')}`;
+      if (d === ds) { streak++; check.setDate(check.getDate()-1); }
+      else if (d < ds) break;
+    }
+
+    document.getElementById('ov-today').textContent    = numFmt(todayCount);
+    document.getElementById('ov-month').textContent    = numFmt(monthCount);
+    document.getElementById('ov-year').textContent     = numFmt(yearCount);
+    document.getElementById('ov-streak').textContent   = streak;
+    document.getElementById('today-big').textContent   = numFmt(todayCount);
+    document.getElementById('today-date-label').textContent = formatDate(new Date());
+
+    renderWeeklyChart();
+    renderRecentTable(allRecords.slice(0, 5));
+  } catch(e) { console.error(e); }
+}
+
+function renderWeeklyChart() {
+  const el = document.getElementById('weekly-chart');
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const rec = allRecords.find(r => r.date === ds);
+    days.push({ label: d.toLocaleDateString('en-IN',{weekday:'short'}), val: rec ? (rec.count||0) : 0 });
+  }
+  const maxVal = Math.max(...days.map(d=>d.val), 1);
+  el.innerHTML = days.map(d => `
+    <div class="chart-bar-item">
+      <div class="chart-bar-val">${d.val > 0 ? d.val : ''}</div>
+      <div class="chart-bar" style="height:${Math.max((d.val/maxVal)*120,4)}px;"></div>
+      <div class="chart-bar-label">${d.label}</div>
+    </div>`).join('');
+}
+
+function renderRecentTable(records) {
+  const tbody = document.getElementById('recent-tbody');
+  if (!records.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No records yet. Start submitting!</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = records.map(r => `
+    <tr>
+      <td><strong>${formatDate(new Date(r.date+'T00:00:00'))}</strong></td>
+      <td><span class="badge badge-accent" style="font-size:1rem;">${numFmt(r.count||0)}</span></td>
+      <td>${r.brandName || currentUser.brand || '—'}</td>
+      <td>${r.dealershipName || currentUser.dealershipName || '—'}</td>
+      <td class="actions">
+        <button class="btn btn-sm btn-primary" onclick="openEditModal('${r.id}','${r.date}',${r.count||0},'${(r.notes||'').replace(/'/g,"\\'")}')">Edit</button>
+      </td>
+    </tr>`).join('');
+}
+
+/* ══════════════════════════════
+   SUBMIT REVIEWS
+   ══════════════════════════════ */
+async function checkExistingSubmission() {
+  const date = document.getElementById('submit-date').value;
+  if (!date) return;
+  await fetchUserRecords();   // FIX: fresh fetch so existing record is never missed
+  const rec  = allRecords.find(r => r.date === date);
+  const card = document.getElementById('submit-existing-card');
+  if (rec) {
+    document.getElementById('review-count').value = rec.count || 0;
+    document.getElementById('submit-notes').value = rec.notes || '';
+    document.getElementById('submit-existing-text').textContent =
+      `You already submitted ${rec.count} reviews for ${formatDate(new Date(date+'T00:00:00'))}. Submitting again will update the record.`;
+    card.classList.remove('hidden');
+  } else {
+    card.classList.add('hidden');
+    document.getElementById('review-count').value = 0;
+    document.getElementById('submit-notes').value = '';
+  }
+}
+
+async function submitReviews() {
+  const date  = document.getElementById('submit-date').value;
+  const count = parseInt(document.getElementById('review-count').value) || 0;
+  const notes = document.getElementById('submit-notes').value.trim();
+  const msgEl = document.getElementById('submit-msg');
+  msgEl.classList.add('hidden');
+
+  if (!date) {
+    msgEl.textContent = 'Please select a date.';
+    msgEl.className = 'alert alert-danger';
+    msgEl.classList.remove('hidden');
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+
+  try {
+    const docId = `${currentUser.uid}_${date}`;
+    await setDoc(doc(db, 'reviews', docId), {
+      employeeId:     currentUser.uid,
+      employeeName:   currentUser.name,
+      employeeEmail:  currentUser.email,
+      dealership:     currentUser.dealership     || null,
+      dealershipName: currentUser.dealershipName || null,
+      brand:          currentUser.brand || null,
+      brandName:      currentUser.brand || null,
+      date, count, notes,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    msgEl.textContent = `✅ Successfully submitted ${count} reviews for ${formatDate(new Date(date+'T00:00:00'))}!`;
+    msgEl.className = 'alert alert-success';
+    msgEl.classList.remove('hidden');
+    showToast('Reviews submitted!', 'success');
+    await fetchUserRecords();
+    renderWeeklyChart();
+    renderRecentTable(allRecords.slice(0, 5));
+    checkExistingSubmission();
+    setTimeout(() => msgEl.classList.add('hidden'), 4000);
+  } catch(e) {
+    msgEl.textContent = 'Error: ' + e.message;
+    msgEl.className = 'alert alert-danger';
+    msgEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Submit Reviews'; btn.disabled = false;
+}
+
+/* ══════════════════════════════
+   MY RECORDS (HISTORY)
+   ══════════════════════════════ */
+async function loadHistory() {
+  const monthFilter = document.getElementById('history-month-filter').value;
+  const tbody = document.getElementById('history-tbody');
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;"><div class="spinner" style="width:24px;height:24px;border-width:3px;margin:0 auto;"></div></td></tr>`;
+
+  try {
+    await fetchUserRecords();   // FIX: always fetches fresh Firestore data
+    let records = allRecords;
+    if (monthFilter) records = records.filter(r => r.date?.startsWith(monthFilter));
+    records = [...records].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+    if (!records.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No records found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = records.map(r => `
+      <tr>
+        <td><strong>${formatDate(new Date(r.date+'T00:00:00'))}</strong></td>
+        <td><span class="badge badge-accent" style="font-size:0.95rem;">${numFmt(r.count||0)}</span></td>
+        <td>${r.notes || '<span style="color:var(--text-muted)">—</span>'}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted);">${r.updatedAt?.toDate ? formatDate(r.updatedAt.toDate()) : '—'}</td>
+        <td class="actions">
+          <button class="btn btn-sm btn-primary" onclick="openEditModal('${r.id}','${r.date}',${r.count||0},'${(r.notes||'').replace(/'/g,"\\'")}')">Edit</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:var(--danger);">${e.message}</td></tr>`;
+  }
+}
+
+/* ══════════════════════════════
+   EDIT RECORD
+   ══════════════════════════════ */
+window.openEditModal = function(id, date, count, notes) {
+  document.getElementById('edit-record-id').value = id;
+  document.getElementById('edit-date').value      = date;
+  document.getElementById('edit-count').value     = count;
+  document.getElementById('edit-notes').value     = notes || '';
+  document.getElementById('edit-msg').classList.add('hidden');
+  openModal();
+};
+
+async function saveEdit() {
+  const id    = document.getElementById('edit-record-id').value;
+  const count = parseInt(document.getElementById('edit-count').value) || 0;
+  const notes = document.getElementById('edit-notes').value.trim();
+  const msgEl = document.getElementById('edit-msg');
+  const btn   = document.getElementById('edit-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    await updateDoc(doc(db, 'reviews', id), { count, notes, updatedAt: serverTimestamp() });
+    showToast('Record updated!', 'success');
+    closeModal();
+    // FIX: single fetch, refresh all dependent views
+    await fetchUserRecords();
+    renderRecentTable(allRecords.slice(0, 5));
+    renderWeeklyChart();
+    loadHistory();
+  } catch(e) {
+    msgEl.textContent = 'Error: ' + e.message;
+    msgEl.className = 'alert alert-danger';
+    msgEl.classList.remove('hidden');
+  }
+  btn.textContent = 'Save Changes'; btn.disabled = false;
+}
+
+/* ══════════════════════════════
+   MY STATS
+   ══════════════════════════════ */
+async function loadStats() {
+  const month = monthStr();
+  const year  = yearStr();
+
+  await fetchUserRecords();   // FIX: always fetches fresh Firestore data
+
+  const monthRecords = allRecords.filter(r => r.date?.startsWith(month));
+  const yearRecords  = allRecords.filter(r => r.date?.startsWith(year));
+  const monthTotal   = monthRecords.reduce((s,r) => s+(r.count||0), 0);
+  const yearTotal    = yearRecords.reduce((s,r)  => s+(r.count||0), 0);
+  const activeDays   = yearRecords.length;
+  const avg          = activeDays > 0 ? Math.round(yearTotal / activeDays) : 0;
+
+  document.getElementById('stats-month').textContent       = numFmt(monthTotal);
+  document.getElementById('stats-month-label').textContent = getMonthName(month);
+  document.getElementById('stats-year').textContent        = numFmt(yearTotal);
+  document.getElementById('stats-year-label').textContent  = year;
+  document.getElementById('stats-avg').textContent         = numFmt(avg);
+
+  // Monthly breakdown chart
+  const breakdown = document.getElementById('monthly-breakdown');
+  const monthsMap  = {};
+  allRecords.forEach(r => {
+    const m = r.date?.slice(0,7);
+    if (m) monthsMap[m] = (monthsMap[m]||0) + (r.count||0);
+  });
+  const months = Object.entries(monthsMap).sort((a,b) => b[0].localeCompare(a[0])).slice(0, 12);
+  const maxM   = Math.max(...months.map(m=>m[1]), 1);
+
+  if (!months.length) {
+    breakdown.innerHTML = `<div class="empty-state"><h4>No data yet</h4></div>`;
+    return;
+  }
+  breakdown.innerHTML = months.map(([m, v]) => `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-weight:800;font-size:0.9rem;">${getMonthName(m)}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:900;color:var(--primary);">${numFmt(v)}</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${Math.round((v/maxM)*100)}%"></div></div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
